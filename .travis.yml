@@ -1,10 +1,16 @@
 language: python
-
+python:
+    - "3.6"
+before_install:
+    - pip install pytest pytest-cov
+    - pip install codecov
+    
 install:
 - pip install -r requirements.txt
 
 script:
-- py.test --cov-report term --cov=app/test/
+    - pytest --cov=./
+    - py.test --cov-report term --cov=app/test/
 
 env:
 - CODECOV_TOKEN=cd757494-68f8-46ab-a2b3-41d9d8496aed
