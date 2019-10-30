@@ -17,7 +17,7 @@ Here the elementary functions include: (1) A single arithmetic operation, such a
 
 The chain rule dictates that 
 
-$$\dfrac{df(g(x))}{dx}=\dfrac{df(x_1)}{dx_1}*\dfrac{dg(x)}{dx}.$$
+$$\frac{df(g(x))}{dx}=\frac{df(x_1)}{dx_1}*\frac{dg(x)}{dx}.$$
 
 Therefore, a function that is made up of elementary functions can be extended into a computational graph. For $f(x,y) =3*x^2+\exp(y)$, the graph is shown below. Each $x_i$ is the output of an elementary function.
 
