@@ -140,14 +140,30 @@ Each node will contain
 - References to the two mathematical objects that are going to be transformed in the operation
 - Importantly, *a node does not reference its children*. That is, say we have the following situation:
 
-![](https://i.imgur.com/p2gMe9B.png)
-
-
+```mermaid
+graph RL
+    C((C)) --> A((A));
+    C      --> B((B));
+    E((E)) --> D((D));
+    F((F)) --> C;
+    F      --> E;
+```
 In this case, C knows about A and B, but not about F. This may seem counterintuitive, since in the forward mode of autodiff, we need to go from A to C to F. However, we want to allow for situations like the following:
-
-![](https://i.imgur.com/eWljQhb.png)
-
-
+```mermaid
+graph RL
+    subgraph f3
+        subgraph f1
+            C((C))-->A((A))
+            C((C))-->B((B))
+        end
+        subgraph f2
+            F((F))-->D((D))
+            F((F))-->E((D))
+        end
+        G((G))-->F
+        G((G))-->C
+    end
+```
 Here, the function `f3` is composed of two inputs (`f1` and `f2`) and combines them in an operation in node G. Rather than copying functions `f1` and `f2` into brand new graphs, we believe that it would be more memory- and time-efficient to simply refer to the same graph objects that `f1` and `f2` refer to. However, this creates a potential issue if we were to implement the graphs as bidirectional, rather than unidirectional: if we add a connection from G to C *and* C to G, then if the user tries to run the forward mode of autodiff on `f1`, the algorithm will continue past node C onto node G. However, node G is not part of function `f1`!
 
 This design choice has a tradeoff, namely that each time autodifferentiation is performed, Python must step from the end of the function all the way to the beginning leaf nodes. In development, we will run tests to determine if this significantly impacts performance. If it does, then we will consider strategies to alleviate the issue. One potential solution would be to make the graph bidirectional, but to also store a reference to the root node. Then, when the algorithm reaches the root node, it knows to stop.
@@ -188,10 +204,26 @@ This design choice has a tradeoff, namely that each time autodifferentiation is 
 
 
 **Inheritance diagram**
-
-![](https://i.imgur.com/nBNsIjl.png)
-![](https://i.imgur.com/q5H4ZZE.png)
-
+```mermaid 
+graph TB
+    Variable-->Expression;
+    BaseDifferentiator-->ForwardDifferentiator;
+    BaseDifferentiator-->ReverseDifferentiator;
+```    
+```mermaid
+graph TB
+    BaseOperation-->sin;
+    BaseOperation-->cos;
+    BaseOperation-->tan;    
+    BaseOperation-->log;
+    BaseOperation-->exp;
+    BaseOperation-->pow;
+    BaseOperation-->add;
+    BaseOperation-->sub;
+    BaseOperation-->neg;
+    BaseOperation-->mul;
+    BaseOperation-->div;
+```
 
 ### C. Methods and Name Attributes
 
