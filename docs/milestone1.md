@@ -7,12 +7,16 @@ Differentiation is great. It is a necessity in a vast range of applications, suc
 `superdiff` performs automatic differentiation on single- or multi-variable functions using the _forward mode_ as well as the _reverse mode_. The function is stored as an `Expression` class that can output values and derivatives wherever you need it.
 
 ## Background
+
+*Note: if the LaTeX equations aren't rendering and you are on Chrome, consider the LaTeX plugin for Chrome:* https://chrome.google.com/webstore/detail/mathjax-plugin-for-github/ioemnmodlmafdkllaclgeombjnmnbima
+
 Differentiation is the process of finding derivative, which is the rate of change of a function's output with regard to its variables. Take $f(x,y) =3*x^2+\exp(y)$ as an example. Symbolic differentiation gives $\dfrac{\partial f}{\partial x}=6x$ and $\dfrac{\partial f}{\partial y}=\exp(y)$.
 
 Automatic differentiation treats a function as a chain of elementary functions and performs differentiation on each elementry function. 
 Here the elementary functions include: (1) A single arithmetic operation, such as $3*x$ and $x_1+x_2$. (2) A single trigonometric operation, such as $\sin(x)$. (3) A single exponential or logarithmic opration, such as $\log(x)$.
 
 The chain rule dictates that 
+
 $$\dfrac{df(g(x))}{dx}=\dfrac{df(x_1)}{dx_1}*\dfrac{dg(x)}{dx}.$$
 
 Therefore, a function that is made up of elementary functions can be extended into a computational graph. For $f(x,y) =3*x^2+\exp(y)$, the graph is shown below. Each $x_i$ is the output of an elementary function.
@@ -20,7 +24,8 @@ Therefore, a function that is made up of elementary functions can be extended in
 <img src="https://i.imgur.com/hBQvv4n.jpg" alt="drawing" width="600"/>
   
 To calulate the derivative of $f$ at $[x,\ y]$, we pass the value of the previous $x_i$ or $x_i^\prime$ into the next elementary function to evaluate the derivative of that elementary function. The full derivative is computed using the chain rule. To get $\dfrac{\partial f}{\partial x}$, forward mode starts from $\dfrac{\partial x_1}{\partial x}$, while the reverse mode starts from $\dfrac{\partial x_6}{\partial x_4}$. The result is 
-$$\dfrac{\partial f}{\partial x} = \dfrac{\partial x_6}{\partial x_4}\dfrac{\partial x_4}{\partial x_3}\dfrac{\partial x_3}{\partial x_1}\dfrac{\partial x_1}{\partial x}=1*3*2x*1=6x$$
+
+$$\dfrac{\partial f}{\partial x} = \dfrac{\partial x_6}{\partial x_4}\dfrac{\partial x_4}{\partial x_3}\dfrac{\partial x_3}{\partial x_1}\dfrac{\partial x_1}{\partial x}=1*3*2x*1=6x.$$
 
 
 
