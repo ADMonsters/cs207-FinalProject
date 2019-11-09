@@ -7,10 +7,10 @@ class Expression():
         self.p2 = p2
         self.operation = operation
         for i in varlist:
-            "..."
+            "Assign variables"
 
     def val(self):
-        eval(self.operation + ".value(self.p1, self.p2)") # eval() is used to call an Operation
+        eval(self.operation + ".value(self.p1, self.p2)") # eval() calls an Operation
         "..."
         pass
 
@@ -19,9 +19,12 @@ class Expression():
         pass
 
     def __add__(self, other):
-        "...needs to handle the varlist"
+        "recompile the varlist"
         pass
 
+    def forward(self, value_input):
+        "Assign values to variables"
+        pass
 
 
 
