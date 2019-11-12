@@ -82,14 +82,14 @@ class Var:
 
 
 class Expression:
-    def __init__(self, parent1, parent2, operation, vars):
+    def __init__(self, parent1, parent2, operation, varlist):
         """
         Initialize an Expression.
 
         :param parent1: First parent Expression
         :param parent2: Second parent Expression
         :param operation: Operation to combine the two parents
-        :param vars: Varlist
+        :param varlist: Varlist
             Must be in the same order in which numbers will be passed in upon
             evaluation or differentiation of the Expression
         """
@@ -97,7 +97,7 @@ class Expression:
         self.parent2 = parent2
         self.parents = [self.parent1, self.parent2]
         self.operation = operation
-        self.vars = vars
+        self.vars = varlist
         self.matched_vars = self._match_vars_to_parents()
 
     def _match_vars_to_parents(self):
@@ -115,6 +115,8 @@ class Expression:
 
     def eval(self, *args):
         """Evaluate this Expression at the specified point
+
+        TODO: Deal with unary operations
 
         :param args: tuple of values to evaluate the Expression at
         :return: Result (length depends on dimensionality of co-domain)
