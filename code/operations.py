@@ -1,31 +1,23 @@
 import numpy as np
+from numbers import Number
 
-
-class add():
+class add:
+    def __call__(self, left, right):  # call method calls the expr method
+        return self.expr(left, right)
+    
     @staticmethod
-    def expr(left, right, varlist):
-        '''need code to rearrange the varlist'''
+    def expr(left, right): # this method makes an Expression
         
-        assert isinstance(left, Expression) or isinstance(left, Variable) or isinstance(left, int) or isinstance(left, float), "Not float/int/Variable/Expression"
-        assert isinstance(right, Expression) or isinstance(right, Variable) or isinstance(right, int) or isinstance(right, float), "Not float/int/Variable/Expression"
+        assert isinstance(left, Variable) or isinstance(left, Number), "Not a number/Variable/Expression"
+        assert isinstance(right, Variable) or isinstance(left, Number), "Not a number/Variable/Expression"
         
-        node = Expression(parent1=left, parent2=right, operation=add, varlist=varlist)
+        node = Expression(parent1=left, parent2=right, operation=add)
         return node
 
     @staticmethod
-    def value(left, right):
-        try:
-            left_val = left.val()   # left is an Expression object
-        except:
-            left_val = left   # left is a number
-
-        try:
-            right_val = right.val()  
-        except:
-            right_val = right
-
-        result = left_val + right_val
-        return result
+    def value(left, right): 
+  
+        return left + right
 
     @staticmethod
     def deriv(left, right):
@@ -44,31 +36,23 @@ class add():
 
 
 
-class sub():
+class sub:
+    def __call__(self, left, right):  # call method calls the expr method
+        return self.expr(left, right)
+    
     @staticmethod
-    def expr(left, right):
-        '''need code to rearrange the varlist'''
+    def expr(left, right): # this method makes an Expression
 
-        assert isinstance(left, Expression) or isinstance(left, Variable) or isinstance(left, int) or isinstance(left, float), "Not float/int/Variable/Expression"
-        assert isinstance(right, Expression) or isinstance(right, Variable) or isinstance(right, int) or isinstance(right, float), "Not float/int/Variable/Expression"
+        assert isinstance(left, Variable) or isinstance(left, Number), "Not a number/Variable/Expression"
+        assert isinstance(right, Variable) or isinstance(left, Number), "Not a number/Variable/Expression"
         
-        node = Expression(parent1=left, parent2=right, operation=sub, varlist=varlist)  
+        node = Expression(parent1=left, parent2=right, operation=sub)  
         return node
 
     @staticmethod
     def value(left, right):
-        try:
-            left_val = left.val()   # left is an Expression object
-        except:
-            left_val = left   # left is a number
-
-        try:
-            right_val = right.val()  
-        except:
-            right_val = right
-
-        result = left_val - right_val
-        return result
+        
+        return left - right
 
     @staticmethod
     def deriv(left, right):
@@ -87,31 +71,23 @@ class sub():
 
 
 
-class mul():
+class mul:
+    def __call__(self, left, right):  # call method calls the expr method
+        return self.expr(left, right)
+    
     @staticmethod
-    def expr(left, right):
-        '''need code to rearrange the varlist'''
+    def expr(left, right):  # this method makes an Expression
 
-        assert isinstance(left, Expression) or isinstance(left, Variable) or isinstance(left, int) or isinstance(left, float), "Not float/int/Variable/Expression"
-        assert isinstance(right, Expression) or isinstance(right, Variable) or isinstance(right, int) or isinstance(right, float), "Not float/int/Variable/Expression"
+        assert isinstance(left, Variable) or isinstance(left, Number), "Not a number/Variable/Expression"
+        assert isinstance(right, Variable) or isinstance(left, Number), "Not a number/Variable/Expression"
         
-        node = Expression(parent1=left, parent2=right, operation=mul, varlist=varlist)  
+        node = Expression(parent1=left, parent2=right, operation=mul)  
         return node
 
     @staticmethod
     def value(left, right):
-        try:
-            left_val = left.val()   # left is an Expression object
-        except:
-            left_val = left   # left is a number
-
-        try:
-            right_val = right.val()  
-        except:
-            right_val = right
-
-        result = left_val * right_val
-        return result
+        
+        return left * right
 
     @staticmethod
     def deriv(left, right):
@@ -141,14 +117,16 @@ class mul():
 
 
 class div():
+    def __call__(self, left, right):  # call method calls the expr method
+        return self.expr(left, right)
+    
     @staticmethod
-    def expr(left, right):
-        '''need code to rearrange the varlist'''
+    def expr(left, right): # this method makes an Expression
 
-        assert isinstance(left, Expression) or isinstance(left, Variable) or isinstance(left, int) or isinstance(left, float), "Not float/int/Variable/Expression"
-        assert isinstance(right, Expression) or isinstance(right, Variable) or isinstance(right, int) or isinstance(right, float), "Not float/int/Variable/Expression"
+        assert isinstance(left, Variable) or isinstance(left, Number), "Not a number/Variable/Expression"
+        assert isinstance(right, Variable) or isinstance(left, Number), "Not a number/Variable/Expression"
         
-        node = Expression(parent1=left, parent2=right, operation=div, varlist=varlist)  
+        node = Expression(parent1=left, parent2=right, operation=div)  
         return node
 
     @staticmethod
@@ -197,7 +175,7 @@ def neg(something):
     '''
     unary operation that returns the negative of something
     '''
-    node = Expression(0 - something, varlist=something.vars)
+    node = Expression(0 - something)
     return node
 
 
@@ -206,38 +184,36 @@ def pos(something):
     '''
     unary operation that returns the positive of something
     '''
-    node = Expression(0 + something, varlist=something.vars)
+    node = Expression(0 + something)
     return node
 
 
 
-class exp():
+class exp:
     """
     This is e to the x-th power.
     param exponent -- an Expression or a number
-    """ 
+    """
+    def __call__(self, exponent):  # call method calls the expr method
+        return self.expr(exponent)
+    
     @staticmethod
     def expr(exponent):
-        if isinstance(exponent, Expression) or isinstance(exponent, Variable):
+        if isinstance(exponent, Variable):  # returns an Expression
 
-            node = Expression(parent1=exponent, parent2=None, operation=exp, varlist=exponent.vars)  
+            node = Expression(parent1=exponent, parent2=None, operation=exp)  
             return node
         
-        elif isinstance(exponent, int) or isinstance(exponent, float):
+        elif isinstance(exponent, Number):  # exp(number) is just a number
             return np.exp(exponent)
 
         else:
-            raise TypeError("Not float/int/Variable/Expression")
+            raise TypeError("Not a number/Variable/Expression")
 
     @staticmethod
     def value(exponent):
-        try:
-            exponent_val = exponent.val()  
-        except:
-            exponent_val = exponent
-
-        result = np.e ** exponent_val
-        return result
+        
+        return np.e ** exponent
 
     @staticmethod
     def deriv(exponent):
@@ -261,29 +237,26 @@ class log():
     This is natural logarithm.
     param exponent -- an Expression or a number
     """ 
+    def __call__(self, exponent):  # call method calls the expr method
+        return self.expr(exponent)
+    
     @staticmethod
     def expr(exponent):
-        if isinstance(exponent, Expression) or isinstance(exponent, Variable):
+        if isinstance(exponent, Variable):  # returns an Expression
 
-            node = Expression(parent1=exponent, parent2=None, operation=log, varlist=exponent.vars)  
+            node = Expression(parent1=exponent, parent2=None, operation=log)  
             return node
         
-        elif isinstance(exponent, int) or isinstance(exponent, float):
+        elif isinstance(exponent, Number):  # exp(number) is just a number
             return np.log(exponent)
 
         else:
-            raise TypeError("Not float/int/Variable/Expression")
-        
+            raise TypeError("Not a number/Variable/Expression")
 
     @staticmethod
     def value(exponent):
-        try:
-            exponent_val = exponent.val()  
-        except:
-            exponent_val = exponent
-
-        result = np.log(exponent_val)
-        return result
+        
+        return np.log(exponent)
 
     @staticmethod
     def deriv(exponent):
@@ -307,8 +280,7 @@ def pow(base, exponent):
     returns an Expression
     pow(base, exponent) = exp(exponent * log(base))
     '''
-    # needs to combine varlist
-    nodes = Expression(exp(exponent * log(base)), varlist=varlist)
+    nodes = Expression(exp(exponent * log(base)))
     return nodes
 
 
@@ -318,29 +290,27 @@ class sin():
     This is sine function.
     param angle -- an Expression or a number
     """ 
+    def __call__(self, angle):  # call method calls the expr method
+        return self.expr(angle)
+    
     @staticmethod
-    def expr(angle):
-        if isinstance(angle, Expression) or isinstance(angle, Variable):
+    def expr(exponent):
+        if isinstance(angle, Variable):  # returns an Expression
 
-            node = Expression(parent1=angle, parent2=None, operation=sin, varlist=angle.vars)   
+            node = Expression(parent1=angle, parent2=None, operation=sin)  
             return node
         
-        elif isinstance(angle, int) or isinstance(angle, float):
+        elif isinstance(angle, Number):  # exp(number) is just a number
             return np.sin(angle)
 
         else:
-            raise TypeError("Not float/int/Variable/Expression")
+            raise TypeError("Not a number/Variable/Expression")
           
 
     @staticmethod
     def value(angle):
-        try:
-            angle_val = angle.val()  
-        except:
-            angle_val = angle
-
-        result = np.sin(angle_val)
-        return result
+        
+        return np.sin(angle)
 
     @staticmethod
     def deriv(angle):
@@ -363,28 +333,26 @@ class cos():
     This is cosine function.
     param angle -- an Expression or a number
     """ 
+    def __call__(self, angle):  # call method calls the expr method
+        return self.expr(angle)
+    
     @staticmethod
-    def expr(angle):
-        if isinstance(angle, Expression) or isinstance(angle, Variable):
+    def expr(exponent):
+        if isinstance(angle, Variable):  # returns an Expression
 
-            node = Expression(parent1=angle, parent2=None, operation=cos, varlist=angle.vars)   
+            node = Expression(parent1=angle, parent2=None, operation=cos)  
             return node
         
-        elif isinstance(angle, int) or isinstance(angle, float):
+        elif isinstance(angle, Number):  # exp(number) is just a number
             return np.cos(angle)
 
         else:
-            raise TypeError("Not float/int/Variable/Expression")
+            raise TypeError("Not a number/Variable/Expression")
 
     @staticmethod
     def value(angle):
-        try:
-            angle_val = angle.val()  
-        except:
-            angle_val = angle
-
-        result = np.cos(angle_val)
-        return result
+        
+        return np.cos(angle)
 
     @staticmethod
     def deriv(angle):
@@ -407,28 +375,26 @@ class tan():
     This is tangent function.
     param angle -- an Expression or a number
     """ 
+    def __call__(self, angle):  # call method calls the expr method
+        return self.expr(angle)
+    
     @staticmethod
-    def expr(angle):
-        if isinstance(angle, Expression) or isinstance(angle, Variable):
+    def expr(exponent):
+        if isinstance(angle, Variable):  # returns an Expression
 
-            node = Expression(parent1=angle, parent2=None, operation=tan, varlist=angle.vars)   
+            node = Expression(parent1=angle, parent2=None, operation=tan)  
             return node
         
-        elif isinstance(angle, int) or isinstance(angle, float):
+        elif isinstance(angle, Number):  # exp(number) is just a number
             return np.tan(angle)
 
         else:
-            raise TypeError("Not float/int/Variable/Expression")
+            raise TypeError("Not a number/Variable/Expression")
 
     @staticmethod
     def value(angle):
-        try:
-            angle_val = angle.val()  
-        except:
-            angle_val = angle
-
-        result = np.tan(angle_val)
-        return result
+        
+        return np.tan(angle)
 
     @staticmethod
     def deriv(angle):
