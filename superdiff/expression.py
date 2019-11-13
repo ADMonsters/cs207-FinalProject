@@ -69,12 +69,6 @@ class Var:
     def __rdiv__(self, other):
         return ops.div(other, self)
 
-    def __mod__(self, other):
-        return ops.mod(self, other)
-
-    def __rmod__(self, other):
-        return ops.mod(other, self)
-
     def __pow__(self, power, modulo=None):
         return ops.pow(self, power, modulo=modulo)
 
@@ -82,7 +76,7 @@ class Var:
         return ops.pow(base, self, modulo=modulo)
 
 
-class Expression:
+class Expression(Var):
     def __init__(self, parent1, parent2, operation, varlist):
         """
         Initialize an Expression.
@@ -138,7 +132,7 @@ class Expression:
         :param args: tuple -- values to evaluate the Expression at
         :return: Result (length depends on dimensionality of co-domain)
         """
-        pass
+        raise NotImplementedError()
 
     def _get_input_args(self, parent, *args):
         """Parse the arguments in terms of the ordering for the parent
