@@ -1,40 +1,11 @@
 import numpy as np
 
-## Assume our Expression class looks like this
-class Expression():
-    def __init__(self, p1, p2=None, operation="string", varlist):
-        self.p1 = p1
-        self.p2 = p2
-        self.operation = operation
-        for i in varlist:
-            "Assign variables"
 
-    def val(self):
-        eval(self.operation + ".value(self.p1, self.p2)") # eval() calls an Operation
-        "..."
-        pass
-
-    def der(self):
-        "..."
-        pass
-
-    def __add__(self, other):
-        "recompile the varlist"
-        pass
-
-    def forward(self, value_input):
-        "Assign values to variables"
-        pass
-
-
-
-class BaseOperation():
-
-
-class Add(BaseOperation):
+class add():
     @staticmethod
     def expr(left, right, varlist):
-        node = Expression(p1=left, p2=right, operation="Add", varlist)  
+        '''need code to rearrange the varlist'''
+        node = Expression(parent1=left, parent2=right, operation=add, varlist=varlist)  
         return node
 
     @staticmethod
@@ -67,10 +38,13 @@ class Add(BaseOperation):
         result = left_der + right_der
         return result
 
-class Sub(BaseOperation):
+
+
+class sub():
     @staticmethod
     def expr(left, right):
-        node = Expression(left, right, "Sub", varlist)  
+        '''need code to rearrange the varlist'''
+        node = Expression(parent1=left, parent2=right, operation=sub, varlist=varlist)  
         return node
 
     @staticmethod
@@ -103,10 +77,13 @@ class Sub(BaseOperation):
         result = left_der - right_der
         return result
 
-class Mul(BaseOperation):
+
+
+class mul():
     @staticmethod
     def expr(left, right):
-        node = Expression(left, right, "Mul", varlist)  
+        '''need code to rearrange the varlist'''
+        node = Expression(parent1=left, parent2=right, operation=mul, varlist=varlist)  
         return node
 
     @staticmethod
@@ -136,5 +113,276 @@ class Mul(BaseOperation):
         except:
             right_der = 0
 
-        result = left_der * right.val() + left.val() * right_der 
+        try:
+            left_val = left.val()   # left is an Expression object
+        except:
+            left_val = left   # left is a number
+
+        try:
+            right_val = right.val()  
+        except:
+            right_val = right
+
+        result = left_der * right_val + left_val * right_der 
+        return result
+
+
+
+class div():
+    @staticmethod
+    def expr(left, right):
+        '''need code to rearrange the varlist'''
+        node = Expression(parent1=left, parent2=right, operation=div, varlist=varlist)  
+        return node
+
+    @staticmethod
+    def value(left, right):
+        try:
+            left_val = left.val()   # left is an Expression object
+        except:
+            left_val = left   # left is a number
+
+        try:
+            right_val = right.val()  
+        except:
+            right_val = right
+
+        result = left_val / right_val
+        return result
+
+    @staticmethod
+    def deriv(left, right):
+        try:
+            left_der = left.der()   # left is an Expression object
+        except:
+            left_der = 0   # left is a number
+
+        try:
+            right_der = right.der()   
+        except:
+            right_der = 0
+
+        try:
+            left_val = left.val()   # left is an Expression object
+        except:
+            left_val = left   # left is a number
+
+        try:
+            right_val = right.val()  
+        except:
+            right_val = right
+
+        result = (left_der * right_val - left_val * right_der) / (right_val)**2
+        return result
+   
+
+
+def neg(something):
+    '''
+    unary operation that returns the negative of something
+    '''
+    node = Expression(0 - something, varlist=something.vars)
+    return node
+
+
+
+def pos(something):
+    '''
+    unary operation that returns the positive of something
+    '''
+    node = Expression(0 + something, varlist=something.vars)
+    return node
+
+
+
+class exp():
+    """
+    This is e to the x-th power.
+    param exponent -- an Expression or a number
+    """ 
+    @staticmethod
+    def expr(exponent):
+        node = Expression(parent1=exponent, parent2=None, operation=exp, varlist=exponent.vars)  
+        return node
+
+    @staticmethod
+    def value(exponent):
+        try:
+            exponent_val = exponent.val()  
+        except:
+            exponent_val = exponent
+
+        result = np.e ** exponent_val
+        return result
+
+    @staticmethod
+    def deriv(exponent):
+        try:
+            exponent_val = exponent.val()  
+        except:
+            exponent_val = exponent
+            
+        try:
+            exponent_der = exponent.der()  
+        except:
+            exponent_der = 0
+
+        result = exponent_val * exponent_der
+        return result
+
+
+
+class log():
+    """
+    This is natural logarithm.
+    param exponent -- an Expression or a number
+    """ 
+    @staticmethod
+    def expr(exponent):
+        node = Expression(parent1=exponent, parent2=None, operation=log, varlist=exponent.vars)  
+        return node
+
+    @staticmethod
+    def value(exponent):
+        try:
+            exponent_val = exponent.val()  
+        except:
+            exponent_val = exponent
+
+        result = np.log(exponent_val)
+        return result
+
+    @staticmethod
+    def deriv(exponent):
+        try:
+            exponent_val = exponent.val()  
+        except:
+            exponent_val = exponent
+            
+        try:
+            exponent_der = exponent.der()  
+        except:
+            exponent_der = 0
+
+        result = 1 / exponent_val * exponent_der
+        return result
+
+
+
+def pow(base, exponent):
+    '''
+    returns an Expression
+    pow(base, exponent) = exp(exponent * log(base))
+    '''
+    # needs to combine varlist
+    nodes = Expression(exp(exponent * log(base)), varlist=varlist)
+    return nodes
+
+
+
+class sin():
+    """
+    This is sine function.
+    param angle -- an Expression or a number
+    """ 
+    @staticmethod
+    def expr(angle):
+        node = Expression(parent1=angle, parent2=None, operation=sin, varlist=angle.vars)  
+        return node
+
+    @staticmethod
+    def value(angle):
+        try:
+            angle_val = angle.val()  
+        except:
+            angle_val = angle
+
+        result = np.sin(angle_val)
+        return result
+
+    @staticmethod
+    def deriv(angle):
+        try:
+            angle_val = angle.val()  
+        except:
+            angle_val = angle
+            
+        try:
+            angle_der = angle.der()  
+        except:
+            angle_der = 0
+
+        result = np.cos(angle_val) * angle_der
+        return result
+
+
+class cos():
+    """
+    This is cosine function.
+    param angle -- an Expression or a number
+    """ 
+    @staticmethod
+    def expr(angle):
+        node = Expression(parent1=angle, parent2=None, operation=cos, varlist=angle.vars)  
+        return node
+
+    @staticmethod
+    def value(angle):
+        try:
+            angle_val = angle.val()  
+        except:
+            angle_val = angle
+
+        result = np.cos(angle_val)
+        return result
+
+    @staticmethod
+    def deriv(angle):
+        try:
+            angle_val = angle.val()  
+        except:
+            angle_val = angle
+            
+        try:
+            angle_der = angle.der()  
+        except:
+            angle_der = 0
+
+        result = -np.sin(angle_val) * angle_der
+        return result
+
+
+class tan():
+    """
+    This is tangent function.
+    param angle -- an Expression or a number
+    """ 
+    @staticmethod
+    def expr(angle):
+        node = Expression(parent1=angle, parent2=None, operation=tan, varlist=angle.vars)  
+        return node
+
+    @staticmethod
+    def value(angle):
+        try:
+            angle_val = angle.val()  
+        except:
+            angle_val = angle
+
+        result = np.tan(angle_val)
+        return result
+
+    @staticmethod
+    def deriv(angle):
+        try:
+            angle_val = angle.val()  
+        except:
+            angle_val = angle
+            
+        try:
+            angle_der = angle.der()  
+        except:
+            angle_der = 0
+
+        result = 1 / np.cos(angle_val)**2 * angle_der
         return result
