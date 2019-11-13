@@ -100,6 +100,10 @@ class Expression:
         self.vars = varlist
         self.matched_vars = self._match_vars_to_parents()
 
+    def set_vars(self, varlist):
+        self.vars = varlist
+        self.matched_vars = self._match_vars_to_parents()
+
     def _match_vars_to_parents(self):
         """Matches variables to parent1 and parent2
         :return: list[tuple] -- Mapping of vars -> parent Expression objects
