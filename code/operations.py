@@ -5,7 +5,11 @@ class add():
     @staticmethod
     def expr(left, right, varlist):
         '''need code to rearrange the varlist'''
-        node = Expression(parent1=left, parent2=right, operation=add, varlist=varlist)  
+        
+        assert isinstance(left, Expression) or isinstance(left, Variable) or isinstance(left, int) or isinstance(left, float), "Not float/int/Variable/Expression"
+        assert isinstance(right, Expression) or isinstance(right, Variable) or isinstance(right, int) or isinstance(right, float), "Not float/int/Variable/Expression"
+        
+        node = Expression(parent1=left, parent2=right, operation=add, varlist=varlist)
         return node
 
     @staticmethod
@@ -44,6 +48,10 @@ class sub():
     @staticmethod
     def expr(left, right):
         '''need code to rearrange the varlist'''
+
+        assert isinstance(left, Expression) or isinstance(left, Variable) or isinstance(left, int) or isinstance(left, float), "Not float/int/Variable/Expression"
+        assert isinstance(right, Expression) or isinstance(right, Variable) or isinstance(right, int) or isinstance(right, float), "Not float/int/Variable/Expression"
+        
         node = Expression(parent1=left, parent2=right, operation=sub, varlist=varlist)  
         return node
 
@@ -83,6 +91,10 @@ class mul():
     @staticmethod
     def expr(left, right):
         '''need code to rearrange the varlist'''
+
+        assert isinstance(left, Expression) or isinstance(left, Variable) or isinstance(left, int) or isinstance(left, float), "Not float/int/Variable/Expression"
+        assert isinstance(right, Expression) or isinstance(right, Variable) or isinstance(right, int) or isinstance(right, float), "Not float/int/Variable/Expression"
+        
         node = Expression(parent1=left, parent2=right, operation=mul, varlist=varlist)  
         return node
 
@@ -132,6 +144,10 @@ class div():
     @staticmethod
     def expr(left, right):
         '''need code to rearrange the varlist'''
+
+        assert isinstance(left, Expression) or isinstance(left, Variable) or isinstance(left, int) or isinstance(left, float), "Not float/int/Variable/Expression"
+        assert isinstance(right, Expression) or isinstance(right, Variable) or isinstance(right, int) or isinstance(right, float), "Not float/int/Variable/Expression"
+        
         node = Expression(parent1=left, parent2=right, operation=div, varlist=varlist)  
         return node
 
@@ -202,8 +218,16 @@ class exp():
     """ 
     @staticmethod
     def expr(exponent):
-        node = Expression(parent1=exponent, parent2=None, operation=exp, varlist=exponent.vars)  
-        return node
+        if isinstance(exponent, Expression) or isinstance(exponent, Variable):
+
+            node = Expression(parent1=exponent, parent2=None, operation=exp, varlist=exponent.vars)  
+            return node
+        
+        elif isinstance(exponent, int) or isinstance(exponent, float):
+            return np.exp(exponent)
+
+        else:
+            raise TypeError("Not float/int/Variable/Expression")
 
     @staticmethod
     def value(exponent):
@@ -239,8 +263,17 @@ class log():
     """ 
     @staticmethod
     def expr(exponent):
-        node = Expression(parent1=exponent, parent2=None, operation=log, varlist=exponent.vars)  
-        return node
+        if isinstance(exponent, Expression) or isinstance(exponent, Variable):
+
+            node = Expression(parent1=exponent, parent2=None, operation=log, varlist=exponent.vars)  
+            return node
+        
+        elif isinstance(exponent, int) or isinstance(exponent, float):
+            return np.log(exponent)
+
+        else:
+            raise TypeError("Not float/int/Variable/Expression")
+        
 
     @staticmethod
     def value(exponent):
@@ -287,8 +320,17 @@ class sin():
     """ 
     @staticmethod
     def expr(angle):
-        node = Expression(parent1=angle, parent2=None, operation=sin, varlist=angle.vars)  
-        return node
+        if isinstance(angle, Expression) or isinstance(angle, Variable):
+
+            node = Expression(parent1=angle, parent2=None, operation=sin, varlist=angle.vars)   
+            return node
+        
+        elif isinstance(angle, int) or isinstance(angle, float):
+            return np.sin(angle)
+
+        else:
+            raise TypeError("Not float/int/Variable/Expression")
+          
 
     @staticmethod
     def value(angle):
@@ -323,8 +365,16 @@ class cos():
     """ 
     @staticmethod
     def expr(angle):
-        node = Expression(parent1=angle, parent2=None, operation=cos, varlist=angle.vars)  
-        return node
+        if isinstance(angle, Expression) or isinstance(angle, Variable):
+
+            node = Expression(parent1=angle, parent2=None, operation=cos, varlist=angle.vars)   
+            return node
+        
+        elif isinstance(angle, int) or isinstance(angle, float):
+            return np.cos(angle)
+
+        else:
+            raise TypeError("Not float/int/Variable/Expression")
 
     @staticmethod
     def value(angle):
@@ -359,8 +409,16 @@ class tan():
     """ 
     @staticmethod
     def expr(angle):
-        node = Expression(parent1=angle, parent2=None, operation=tan, varlist=angle.vars)  
-        return node
+        if isinstance(angle, Expression) or isinstance(angle, Variable):
+
+            node = Expression(parent1=angle, parent2=None, operation=tan, varlist=angle.vars)   
+            return node
+        
+        elif isinstance(angle, int) or isinstance(angle, float):
+            return np.tan(angle)
+
+        else:
+            raise TypeError("Not float/int/Variable/Expression")
 
     @staticmethod
     def value(angle):
