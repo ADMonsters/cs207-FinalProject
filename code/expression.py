@@ -8,6 +8,7 @@ Classes:
         - Inherits from Var
         - Can be combined into larger expressions
 """
+import operations as ops
 
 
 class Var:
@@ -45,40 +46,40 @@ class Var:
         return self.name
 
     def __add__(self, other):
-        pass
+        return ops.add(self, other)
 
     def __radd__(self, other):
-        pass
+        return self.__add__(other)
 
     def __sub__(self, other):
-        pass
+        return ops.sub(self, other)
 
     def __rsub__(self, other):
-        pass
+        return ops.sub(other, self)
 
     def __mul__(self, other):
-        pass
+        return ops.mul(self, other)
 
     def __rmul__(self, other):
-        pass
+        return self.__mul__(other)
 
     def __div__(self, other):
-        pass
+        return ops.div(self, other)
 
     def __rdiv__(self, other):
-        pass
+        return ops.div(other, self)
 
     def __mod__(self, other):
-        pass
+        return ops.mod(self, other)
 
     def __rmod__(self, other):
-        pass
+        return ops.mod(other, self)
 
     def __pow__(self, power, modulo=None):
-        pass
+        return ops.pow(self, power, modulo=modulo)
 
-    def __rpow__(self, other):
-        pass
+    def __rpow__(self, base, modulo=None):
+        return ops.pow(base, self, modulo=modulo)
 
 
 class Expression:
@@ -162,3 +163,6 @@ class Expression:
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args)
+
+    def __str__(self):
+        return self.operation.__str__(self.parent1, self.parent2)
