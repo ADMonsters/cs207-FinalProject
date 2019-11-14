@@ -7,7 +7,7 @@ before_install:
 install:
     - pip install -r requirements.txt
 script: 
-    - pytest tests/operations_test.py
+    - pytest --cov=./ tests/operations_test.py
 env:
     - CODECOV_TOKEN=cd757494-68f8-46ab-a2b3-41d9d8496aed
 after_success:
