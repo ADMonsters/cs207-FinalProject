@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 
-import sys 
-sys.path.append('..')
+# import sys 
+# sys.path.append('..')
 
 from superdiff.operations import *
 from superdiff.expression import *
