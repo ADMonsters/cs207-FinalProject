@@ -122,19 +122,24 @@ class Expression(Var):
         :param args: tuple of values to evaluate the Expression at
         :return: Result (length depends on dimensionality of co-domain)
         """
-        self._check_input_length(*args)
-        p1_args = self._get_input_args(self.parent1, *args)
-        p2_args = self._get_input_args(self.parent2, *args)
-
+        p1_args, p2_args = self._parse_args(*args)
         return self.operation(self.parent1(*p1_args), self.parent2(*p2_args))
 
-    def deriv(self, *args):
-        """Differentiate this Expression at the specified point
+    def deriv(self, *args, mode='forward'):
+        """Differentiate this Expression at the specified point.
+
+        Currently just runs forward mode.
 
         :param args: tuple -- values to evaluate the Expression at
+        :param mode: str -- Whether to run in forward or reverse mode
+            (possible options: {'forward', 'reverse', 'auto'})
         :return: Result (length depends on dimensionality of co-domain)
         """
-        raise NotImplementedError()
+        p1_args, p2_args = self._parse_args(*args)
+        return self.operation.deriv(self.parent1.deriv(*p1_args),
+                                    self.parent2.deriv(*p2_args),
+                                    self.parent1(*p1_args),
+                                    self.parent2(*p2_args))
 
     def _get_input_args(self, parent, *args):
         """Parse the arguments in terms of the ordering for the parent
@@ -156,6 +161,17 @@ class Expression(Var):
         """
         assert len(args) == len(self.vars), \
             f'Input length does not match dimension of Expression domain ({len(args)}, ({len(self.vars)})'
+
+    def _parse_args(self, *args):
+        """Check input length and parse arguments in correct order for each parent.
+
+        :param args: tuple[Numeric] -- Arguments to be parsed
+        :return: (tuple[Numeric], tuple[Numeric]) -- p1_args and p2_args
+        """
+        self._check_input_length(*args)
+        p1_args = self._get_input_args(self.parent1, *args)
+        p2_args = self._get_input_args(self.parent2, *args)
+        return p1_args, p2_args
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args)
