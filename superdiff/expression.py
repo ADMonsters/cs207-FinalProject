@@ -8,7 +8,7 @@ Classes:
         - Inherits from Var
         - Can be combined into larger expressions
 """
-import operations as ops
+import superdiff.operations as ops
 
 
 class Var:
@@ -44,6 +44,9 @@ class Var:
 
     def __str__(self):
         return self.name
+        
+    def __call__(self, *args, **kwargs):
+        return self.eval(*args)
 
     def __add__(self, other):
         return ops.add(self, other)
