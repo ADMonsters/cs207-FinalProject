@@ -81,7 +81,7 @@ class Var:
 
 
 class Expression(Var):
-    def __init__(self, parent1, parent2, operation, varlist):
+    def __init__(self, parent1, parent2, operation, varlist=None):
         """
         Initialize an Expression.
 
@@ -97,7 +97,9 @@ class Expression(Var):
         self.parent2 = parent2
         self.parents = [self.parent1, self.parent2]
         self.operation = operation
-        self.vars = varlist
+        if varlist is None:
+            self.vars = parent1.vars[:]
+            self.vars += [v for v in parent2.vars if v not in parent1.vars]
         self.matched_vars = self._match_vars_to_parents()
 
     def set_vars(self, varlist):
