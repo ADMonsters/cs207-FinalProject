@@ -45,6 +45,9 @@ class Var:
 
     def __str__(self):
         return self.name
+        
+    def __call__(self, *args, **kwargs):
+        return self.eval(*args)
 
     def __add__(self, other):
         return ops.add(self, other)
