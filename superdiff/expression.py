@@ -8,7 +8,7 @@ Classes:
         - Inherits from Var
         - Can be combined into larger expressions
 """
-import operations as ops
+from superdiff import operations as ops
 
 
 class Var:
@@ -22,6 +22,7 @@ class Var:
 
     """
     def __init__(self, name):
+        self.vars = []
         self.name = name
 
     def eval(self, x):
@@ -88,6 +89,7 @@ class Expression(Var):
             Must be in the same order in which numbers will be passed in upon
             evaluation or differentiation of the Expression
         """
+        super().__init__('f')
         self.parent1 = parent1
         self.parent2 = parent2
         self.parents = [self.parent1, self.parent2]
@@ -120,19 +122,24 @@ class Expression(Var):
         :param args: tuple of values to evaluate the Expression at
         :return: Result (length depends on dimensionality of co-domain)
         """
-        self._check_input_length(*args)
-        p1_args = self._get_input_args(self.parent1, *args)
-        p2_args = self._get_input_args(self.parent2, *args)
-
+        p1_args, p2_args = self._parse_args(*args)
         return self.operation(self.parent1(*p1_args), self.parent2(*p2_args))
 
-    def deriv(self, *args):
-        """Differentiate this Expression at the specified point
+    def deriv(self, *args, mode='forward'):
+        """Differentiate this Expression at the specified point.
+
+        Currently just runs forward mode.
 
         :param args: tuple -- values to evaluate the Expression at
+        :param mode: str -- Whether to run in forward or reverse mode
+            (possible options: {'forward', 'reverse', 'auto'})
         :return: Result (length depends on dimensionality of co-domain)
         """
-        raise NotImplementedError()
+        p1_args, p2_args = self._parse_args(*args)
+        return self.operation.deriv(self.parent1.deriv(*p1_args),
+                                    self.parent2.deriv(*p2_args),
+                                    self.parent1(*p1_args),
+                                    self.parent2(*p2_args))
 
     def _get_input_args(self, parent, *args):
         """Parse the arguments in terms of the ordering for the parent
@@ -155,8 +162,38 @@ class Expression(Var):
         assert len(args) == len(self.vars), \
             f'Input length does not match dimension of Expression domain ({len(args)}, ({len(self.vars)})'
 
+    def _parse_args(self, *args):
+        """Check input length and parse arguments in correct order for each parent.
+
+        :param args: tuple[Numeric] -- Arguments to be parsed
+        :return: (tuple[Numeric], tuple[Numeric]) -- p1_args and p2_args
+        """
+        self._check_input_length(*args)
+        p1_args = self._get_input_args(self.parent1, *args)
+        p2_args = self._get_input_args(self.parent2, *args)
+        return p1_args, p2_args
+
     def __call__(self, *args, **kwargs):
         return self.eval(*args)
 
     def __str__(self):
         return self.operation.__str__(self.parent1, self.parent2)
+
+
+class Scalar(Var):
+    """
+    A scalar variable
+
+    Methods:
+        eval() -> Number -- Return the scalar value
+        deriv() -> Number -- Return the derivative value (always 0)
+    """
+    def __init__(self, x):
+        self.x = x
+        super().__init__(str(x))
+
+    def eval(self, *args):
+        return self.x
+
+    def deriv(self, *args):
+        return 0
