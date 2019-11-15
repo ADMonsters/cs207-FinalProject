@@ -100,6 +100,8 @@ class Expression(Var):
         if varlist is None:
             self.vars = parent1.vars[:]
             self.vars += [v for v in parent2.vars if v not in parent1.vars]
+        else:
+            self.vars = varlist
         self.matched_vars = self._match_vars_to_parents()
 
     def set_vars(self, varlist):
@@ -128,7 +130,7 @@ class Expression(Var):
         :return: Result (length depends on dimensionality of co-domain)
         """
         p1_args, p2_args = self._parse_args(*args)
-        return self.operation(self.parent1(*p1_args), self.parent2(*p2_args))
+        return self.operation.value(self.parent1(*p1_args), self.parent2(*p2_args))
 
     def deriv(self, *args, mode='forward'):
         """Differentiate this Expression at the specified point.
@@ -153,8 +155,10 @@ class Expression(Var):
         :param args: Arguments in order of self.vars
         :return: list[Var]
         """
-        input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
-        return input_args
+        if isinstance(parent, Var):
+            return (args[self.vars.index(parent)],)
+        else:
+            return [args[self.vars.index(parent_var)] for parent_var in parent.vars]
 
     def _check_input_length(self, *args):
         """Check that the input length matches this function's domain dimensionality.
@@ -165,7 +169,7 @@ class Expression(Var):
         :raises: AssertionError
         """
         assert len(args) == len(self.vars), \
-            f'Input length does not match dimension of Expression domain ({len(args)}, ({len(self.vars)})'
+            f'Input length does not match dimension of Expression domain ({len(args)}, {len(self.vars)})'
 
     def _parse_args(self, *args):
         """Check input length and parse arguments in correct order for each parent.
