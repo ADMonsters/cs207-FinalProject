@@ -9,7 +9,8 @@ def checktype(x):
     assert isinstance(x, Var) or isinstance(x, Number), "Not a number/Variable/Expression"
 
 
-class add():    
+class add():
+    
     @staticmethod
     def expr(left, right): # this method makes an Expression       
         checktype(left)

@@ -50,7 +50,7 @@ class Var:
         return self.eval(*args)
 
     def __add__(self, other):
-        return ops.add(self, other)
+        return ops.add.(self, other)
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -73,11 +73,11 @@ class Var:
     def __rdiv__(self, other):
         return ops.div(other, self)
 
-    def __pow__(self, power, modulo=None):
-        return ops.pow(self, power, modulo=modulo)
+    def __pow__(self, power):
+        return ops.pow(self, power)
 
-    def __rpow__(self, base, modulo=None):
-        return ops.pow(base, self, modulo=modulo)
+    def __rpow__(self, base):
+        return ops.pow(base, self)
 
 
 class Expression(Var):
