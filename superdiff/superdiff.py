@@ -1,6 +1,6 @@
 from typing import Union
 
-from expression import Expression, Var
+from superdiff.expression import Expression, Var
 
 
 def make_expression(expr: Union[Var, Expression], vars=None) -> Expression:
