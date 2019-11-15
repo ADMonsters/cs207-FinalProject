@@ -126,7 +126,7 @@ class Expression(Var):
         :return: Result (length depends on dimensionality of co-domain)
         """
         p1_args, p2_args = self._parse_args(*args)
-        return self.operation(self.parent1(*p1_args), self.parent2(*p2_args))
+        return self.operation.value(self.parent1(*p1_args), self.parent2(*p2_args))
 
     def deriv(self, *args, mode='forward'):
         """Differentiate this Expression at the specified point.
@@ -151,8 +151,10 @@ class Expression(Var):
         :param args: Arguments in order of self.vars
         :return: list[Var]
         """
-        input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
-        return input_args
+        if isinstance(parent, Var):
+            return (args[self.vars.index(parent)],)
+        else:
+            return [args[self.vars.index(parent_var)] for parent_var in parent.vars]
 
     def _check_input_length(self, *args):
         """Check that the input length matches this function's domain dimensionality.
