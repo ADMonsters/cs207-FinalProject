@@ -1,9 +1,11 @@
 import numpy as np
 from numbers import Number
 
+from superdiff.expression import *
+
 class add:
     def __call__(self, left, right):  # call method calls the expr method
-        return self.expr(left, right)
+        return self.value(left, right)
     
     @staticmethod
     def expr(left, right): # this method makes an Expression
