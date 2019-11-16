@@ -8,6 +8,8 @@ Classes:
         - Inherits from Var
         - Can be combined into larger expressions
 """
+from typing import Union
+
 from superdiff import operations as ops
 
 
@@ -50,7 +52,7 @@ class Var:
         return self.eval(*args)
 
     def __add__(self, other):
-        return ops.add.(self, other)
+        return ops.add(self, other)
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -177,6 +179,13 @@ class Expression(Var):
         p1_args = self._get_input_args(self.parent1, *args)
         p2_args = self._get_input_args(self.parent2, *args)
         return p1_args, p2_args
+
+    def _get_parent_vars(self, parent: Union):
+        """Get the vars for given parent
+
+        :param parent:
+        :return:
+        """
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args)
