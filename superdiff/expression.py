@@ -183,13 +183,13 @@ class Expression(Var):
         p1_args, p2_args = self._parse_args(*args)
         return self.operation.eval(self._eval_parent(self.parent1, *p1_args), self._eval_parent(self.parent2, *p2_args))
 
-    def _unary_deriv(self, *args):
+    def _unary_deriv(self, *args, mode='forward'):
         res = []
         for var in self.vars:
             res.append(self.operation.deriv(self._eval_parent(self.parent1, *args),
                                             self._deriv_parent(self.parent1, var, *args)))
 
-    def _binary_deriv(self, *args):
+    def _binary_deriv(self, *args, mode='forward'):
         p1_args, p2_args = self._parse_args(*args)
         res = []
         for var in self.vars:
