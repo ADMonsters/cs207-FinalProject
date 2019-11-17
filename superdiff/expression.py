@@ -122,13 +122,13 @@ class Expression(Var):
         """Matches variables to parent1 and parent2
         :return: list[tuple] -- Mapping of vars -> parent Expression objects
         """
-        matched_vars = []
+        matched_vars = {}
         for var in self.vars:
             parents_of_var = []
             for parent in self.parents:
                 if var in self._get_parent_vars(parent):
                     parents_of_var.append(parent)
-            matched_vars.append((var, parents_of_var))
+            matched_vars.update({var: parents_of_var})
         return matched_vars
 
     def eval(self, *args):
@@ -140,7 +140,7 @@ class Expression(Var):
         :return: Result (length depends on dimensionality of co-domain)
         """
         p1_args, p2_args = self._parse_args(*args)
-        return self.operation.eval(self._eval_parent(self.parent1, p1_args), self._eval_parent(self.parent2, *p2_args))
+        return self.operation.eval(self._eval_parent(self.parent1, *p1_args), self._eval_parent(self.parent2, *p2_args))
 
     def deriv(self, *args, mode='forward'):
         """Differentiate this Expression at the specified point.
@@ -150,13 +150,19 @@ class Expression(Var):
         :param args: tuple -- values to evaluate the Expression at
         :param mode: str -- Whether to run in forward or reverse mode
             (possible options: {'forward', 'reverse', 'auto'})
-        :return: Result (length depends on dimensionality of co-domain)
+        :return: tuple(Number) | Number -- Result (length depends on dimensionality of co-domain)
         """
         p1_args, p2_args = self._parse_args(*args)
-        return self.operation.deriv(self._eval_parent(self.parent1, *p1_args),
-                                    self._deriv_parent(self.parent1, *p1_args),
-                                    self._eval_parent(self.parent2, *p2_args),
-                                    self._deriv_parent(self.parent2, *p2_args))
+        res = []
+        for var in self.vars:
+            res.append(self.operation.deriv(self._eval_parent(self.parent1, *p1_args),
+                                            self._deriv_parent(self.parent1, var, *p1_args),
+                                            self._eval_parent(self.parent2, *p2_args),
+                                            self._deriv_parent(self.parent2, var, *p2_args)))
+        if len(res) == 1:
+            return res[0]
+        else:
+            return tuple(res)
 
     def _get_input_args(self, parent, *args):
         """Parse the arguments in terms of the ordering for the parent
@@ -166,6 +172,7 @@ class Expression(Var):
         :return: list[Var]
         """
         if isinstance(parent, Var):
+            print(parent)
             return [args[self.vars.index(parent)]]
         else:
             input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
@@ -193,7 +200,8 @@ class Expression(Var):
         p2_args = self._get_input_args(self.parent2, *args)
         return p1_args, p2_args
 
-    def _get_parent_vars(self, parent: Union[Var, Number, None]):
+    @staticmethod
+    def _get_parent_vars(parent: Union[Var, Number, None]):
         """Get the vars for given parent
 
         :param parent: Var | Number | None -- The parent of interest
@@ -201,10 +209,13 @@ class Expression(Var):
         """
         if parent is None or isinstance(parent, Number):
             return []
+        elif isinstance(parent, Var):
+            return [parent]
         else:
             return parent.vars[:]
 
-    def _eval_parent(self, parent: Union[Var, Number], *args) -> Number:
+    @staticmethod
+    def _eval_parent(parent: Union[Var, Number], *args) -> Number:
         """Evaluate a parent at `args`, checking if the parent is None or a Number
 
         :param parent: Var | Number | None -- The parent to evaluate
@@ -215,20 +226,27 @@ class Expression(Var):
         else:
             return parent(*args)
 
-    def _deriv_parent(self, parent: Union[Var, Number], *args) -> Number:
+    @staticmethod
+    def _deriv_parent(parent: Union[Var, Number], var: Var, *args) -> Number:
         """Evaluate derivative of a parent at `args`, checking if the parent is a Number
 
         :param parent: The parent of interest
+        :param var: Var -- Variable with respect to which the derivative is
+            being taken
         :param args: Point to differentiate parent at
         :return: Number
         """
         if isinstance(parent, Number):
             return 0
         else:
-            return parent.deriv(*args)
+            if var in parent.vars:
+                return parent.deriv(*args)
+            else:
+                return 0
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args)
 
     def __str__(self):
-        return self.operation.__str__(self.parent1, self.parent2)
+        # TODO: Make this more informative
+        return f'{str(self.operation)}: ({str(self.parent1)}, {str(self.parent2)})'
