@@ -73,12 +73,19 @@ def test_basic_tan():
 f_add = Expression(x, y, Add, [x, y])
 def test_add_expr():
     assert f_add.eval(1,3) == 4
-    assert f_add.deriv(1,3) == 2
+    assert f_add.deriv(1,3) == (1,1)
 
 f_sub = Expression(x, y, Sub, [x, y])
 def test_sub_expr():
     assert f_sub.eval(3,1) == 2
-    assert f_sub.deriv(3,1) == 0
+    assert f_sub.deriv(3,1) == (1,-1)
+
+z = Var("z")
+f_add3 = Expression(x+y, z, Add, [x,y,z])
+def test_add_expr3():
+    assert f_add3.eval(1,2,3) == 6
+    assert f_add3.deriv(1,2,3) == (1,1,1)
+
 
 # error handling and corner cases
 string_a = "H"
