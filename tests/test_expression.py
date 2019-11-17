@@ -5,9 +5,10 @@ Testing methods in class Var and Expression
 """
 import pytest
 import numpy as np
+import superdiff as sd
 from superdiff import make_expression
 from superdiff.expression import *
-from superdiff import operations as ops
+#from superdiff import operations as ops
 
 def test_Var_eval():
     x = Var('x')
@@ -39,22 +40,22 @@ def test_Exp_eval():
     assert f.eval(-4) ==  -6, 'Expression evaluation error.'
     
     # f = 2*sin(x)
-    f = make_expression(2 * ops.sin(x), vars = [x])
-    assert f.eval(2) ==  4, 'Expression evaluation error.'
-    assert f.eval(-4) ==  8, 'Expression evaluation error.'
+    f = make_expression(2 * sd.sin(x), vars = [x])
+    assert np.abs( f.eval(2) - (2 * np.sin(2) )  ) < 1e-7, 'Expression evaluation error.'
+    assert np.abs( f.eval(4) - (2 * np.sin(4) )  ) < 1e-7, 'Expression evaluation error.'
     
     # f = cos(x) + tan(x) * 2
-    f = make_expression(ops.cos(x) + ops.tan(x) * 2, vars = [x])
+    f = make_expression(sd.cos(x) + sd.tan(x) * 2, vars = [x])
     assert np.abs( f.eval(np.pi) - (np.cos(np.pi) + np.tan(np.pi) * 2 )  ) < 1e-7, 'Expression evaluation error.'
     assert np.abs( f.eval(0) - (np.cos(0) + np.tan(0) * 2 )  ) < 1e-7, 'Expression evaluation error.'
     
     # f = 2 - log(x)
-    f = make_expression(2 - ops.log(x), vars = [x])
+    f = make_expression(2 - sd.log(x), vars = [x])
     assert np.abs( f.eval(8) - (2 - np.log(8) )  ) < 1e-7, 'Expression evaluation error.'
     assert np.abs( f.eval(4) - (2 - np.log(4) )  ) < 1e-7, 'Expression evaluation error.'
     
     # f = 2 / exp(x)
-    f = make_expression(2 / ops.exp(x), vars = [x])
+    f = make_expression(2 / sd.exp(x), vars = [x])
     assert np.abs( f.eval(4) - 2/np.log(4) ) < 1e-7, 'Expression evaluation error.'
     assert np.abs( f.eval(10) - 2/np.log(10) ) < 1e-7, 'Expression evaluation error.'
     
@@ -74,24 +75,24 @@ def test_Exp_deriv():
     assert f.deriv(0) ==  2, 'Expression derivative error.'
     
     # f = 2 * sin(x)
-    f = make_expression(2 * ops.sin(x), vars = [x])
+    f = make_expression(2 * sd.sin(x), vars = [x])
     assert np.abs( f.deriv(2) - ( 2*np.cos(2))  ) < 1e-7, 'Expression derivative error.'
     assert np.abs( f.deriv(-2) - ( 2*np.cos(-2))  ) < 1e-7, 'Expression derivative error.'
     
     
     # f = cos(x) + tan(x) * 2
-    f = make_expression(ops.cos(x) + ops.tan(x) * 2, vars = [x])
+    f = make_expression(sd.cos(x) + sd.tan(x) * 2, vars = [x])
     assert np.abs( f.deriv(np.pi) - ( 2*(1/np.cos(np.pi))**2 - np.sin(np.pi))  ) < 1e-7, 'Expression derivative error.'
     assert np.abs( f.deriv(-np.pi) - (2*(1/np.cos(-np.pi))**2 - np.sin(-np.pi))  ) < 1e-7, 'Expression derivative error.'
     
     
     # f = 2 - log(x)
-    f = make_expression(2 - ops.log(x), vars = [x])
+    f = make_expression(2 - sd.log(x), vars = [x])
     assert np.abs( f.deriv(4) - ( -1/4)) < 1e-7, 'Expression derivative error.'
     assert np.abs( f.deriv(8) - ( -1/8)) < 1e-7, 'Expression derivative error.'
     
      # f = 2 / exp(x)
-    f = make_expression(2 / ops.exp(x), vars = [x])
+    f = make_expression(2 / sd.exp(x), vars = [x])
     assert np.abs( f.deriv(4) - ( -2*np.exp(-4))  ) < 1e-7, 'Expression derivative error.'
     assert np.abs( f.deriv(0) - ( -2*np.exp(0)) ) < 1e-7,  'Expression derivative error.'
     
