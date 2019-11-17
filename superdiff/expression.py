@@ -197,22 +197,3 @@ class Expression(Var):
 
     def __str__(self):
         return self.operation.__str__(self.parent1, self.parent2)
-
-
-class Scalar(Var):
-    """
-    A scalar variable
-
-    Methods:
-        eval() -> Number -- Return the scalar value
-        deriv() -> Number -- Return the derivative value (always 0)
-    """
-    def __init__(self, x):
-        self.x = x
-        super().__init__(str(x))
-
-    def eval(self, *args):
-        return self.x
-
-    def deriv(self, *args):
-        return 0
