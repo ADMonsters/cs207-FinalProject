@@ -167,13 +167,10 @@ class Expression(Var):
             (possible options: {'forward', 'reverse', 'auto'})
         :return: tuple(Number) | Number -- Result (length depends on dimensionality of co-domain)
         """
-        p1_args, p2_args = self._parse_args(*args)
-        res = []
-        for var in self.vars:
-            res.append(self.operation.deriv(self._eval_parent(self.parent1, *p1_args), # Evaluate and store once
-                                            self._deriv_parent(self.parent1, var, *p1_args),
-                                            self._eval_parent(self.parent2, *p2_args),
-                                            self._deriv_parent(self.parent2, var, *p2_args)))
+        if self.parent2 is None:
+            res = self._unary_deriv(*args, mode=mode)
+        else:
+            res = self._binary_deriv(*args, mode=mode)
         if len(res) == 1:
             return res[0]
         else:
@@ -185,6 +182,22 @@ class Expression(Var):
     def _binary_eval(self, *args):
         p1_args, p2_args = self._parse_args(*args)
         return self.operation.eval(self._eval_parent(self.parent1, *p1_args), self._eval_parent(self.parent2, *p2_args))
+
+    def _unary_deriv(self, *args):
+        res = []
+        for var in self.vars:
+            res.append(self.operation.deriv(self._eval_parent(self.parent1, *args),
+                                            self._deriv_parent(self.parent1, var, *args)))
+
+    def _binary_deriv(self, *args):
+        p1_args, p2_args = self._parse_args(*args)
+        res = []
+        for var in self.vars:
+            res.append(self.operation.deriv(self._eval_parent(self.parent1, *p1_args),  # Evaluate and store once
+                                            self._deriv_parent(self.parent1, var, *p1_args),
+                                            self._eval_parent(self.parent2, *p2_args),
+                                            self._deriv_parent(self.parent2, var, *p2_args)))
+        return res
 
     def _get_input_args(self, parent, *args):
         """Parse the arguments in terms of the ordering for the parent
