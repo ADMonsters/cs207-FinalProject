@@ -132,17 +132,34 @@ class Pow(BinaryOperation):
 
     @classmethod
     def deriv(cls, num1, deriv1, num2, deriv2):
-        return np.log(num2 * np.log(num1)) * (deriv2 * np.log(num1) + num2 * deriv1 / num1)
+        return np.exp(num2 * np.log(num1)) * (deriv2 * np.log(num1) + num2 * deriv1 / num1)
 
+class Exp(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return np.exp(num)
 
-class Log(UnaryOperation):
+    @classmethod
+    def deriv(cls, num, deriv):
+        return deriv*np.exp(num)
+
+class NLog(UnaryOperation):
     @classmethod
     def eval(cls, num):
         return np.log(num)
 
     @classmethod
     def deriv(cls, val, der):
-        return val / der
+        return der / val
+
+class Log(BinaryOperation):
+    @classmethod
+    def eval(cls, num, base):
+        return np.log(num) / np.log(base)
+
+    @classmethod
+    def deriv(cls, val, der, base, base_der):
+        return (((der / val) * np.log(base)) - ((base_der / base) * np.log(val))) / (np.log(base)**2)
 
 
 class Sin(UnaryOperation):
