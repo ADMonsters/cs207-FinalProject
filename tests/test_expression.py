@@ -3,43 +3,104 @@ test_expression.py
 
 Testing methods in class Var and Expression
 """
-
-import sys
-sys.path.insert(1, '../superdiff/')
-from superdiff import make_expression
-from expression import Var
-from expression import Expression
-import operations as ops
+import numpy as np
+from superdiff.superdiff import make_expression
+from superdiff.expression import *
+from superdiff import operations as ops
 
 def test_Var_eval():
     x = Var('x')
     assert x.eval(2) ==  2, 'Variable evaluation error.'
     assert x.eval(4) ==  4, 'Variable evaluation error.'
-    return 'passed.'
 
 def test_Var_deriv():
     x = Var('x')
     assert x.deriv(2) ==  1, 'Initial derivative of variable is not 1.'
     assert x.deriv(4) ==  1, 'Initial derivative of variable is not 1.'
-    return 'passed.'
     
 def test_Exp_parents():
     x = Var('x')
     y = Var('y')
-    f = Expression(x, y, ops.add, [x,y])
+    f = make_expression( x+y , vars = [x,y])
     assert f.parent1 == x , 'Parent1 does not match.'
-    assert f.parent2 == y , 'Parent1 does not match.'
-    assert f.parents == [x,y] , 'Parent1 does not match.'
-    return 'passed'
+    assert f.parent2 == y , 'Parent2 does not match.'
+    assert f.parents == [x,y] , 'Parents does not match.'
 
 def test_Exp_eval():
-    f = Expression(x, y, ops.add, [x,y])
-    assert f.eval(2,4) ==  6, 'Expression evaluation error.'
-    return 'passed'
+    x = Var('x')
+    scalar_2 = Scalar(2)
+    f = make_expression(scalar_2 + x, vars = [x])
+    assert f.eval(2) ==  4, 'Expression evaluation error.'
+    assert f.eval(4) ==  6, 'Expression evaluation error.'
+    
+    # f = 2 + 2x
+    f = make_expression(scalar_2 + scalar_2 * x, vars = [x])
+    assert f.eval(2) ==  6, 'Expression evaluation error.'
+    assert f.eval(-4) ==  -6, 'Expression evaluation error.'
+    
+    # f = 2*sin(x)
+    f = make_expression(scalar_2 * ops.sin(x), vars = [x])
+    assert f.eval(2) ==  4, 'Expression evaluation error.'
+    assert f.eval(-4) ==  8, 'Expression evaluation error.'
+    
+    # f = cos(x) + tan(x) * 2
+    f = make_expression(ops.cos(x) + ops.tan(x) * scalar_2, vars = [x])
+    assert np.abs( f.eval(np.pi) - (np.cos(np.pi) + np.tan(np.pi) * 2 )  ) < 1e-7, 'Expression evaluation error.'
+    assert np.abs( f.eval(0) - (np.cos(0) + np.tan(0) * 2 )  ) < 1e-7, 'Expression evaluation error.'
+    
+    # f = 2 - log(x)
+    f = make_expression(scalar_2 - ops.log(x), vars = [x])
+    assert np.abs( f.eval(8) - (2 - np.log(8) )  ) < 1e-7, 'Expression evaluation error.'
+    assert np.abs( f.eval(4) - (2 - np.log(4) )  ) < 1e-7, 'Expression evaluation error.'
+    
+    # f = 2 / exp(x)
+    f = make_expression(scalar_2 / ops.exp(x), vars = [x])
+    assert np.abs( f.eval(4) - 2/np.log(4) ) < 1e-7, 'Expression evaluation error.'
+    assert np.abs( f.eval(10) - 2/np.log(10) ) < 1e-7, 'Expression evaluation error.'
+    
+    
+
+def test_Exp_deriv():
+    x = Var('x')
+    scalar_2 = Scalar(2)
+    
+    # f = 2 + x
+    f = make_expression(scalar_2 + x, vars = [x])
+    assert f.deriv(2) ==  1, 'Expression derivative error.'
+    assert f.deriv(0) ==  1, 'Expression derivative error.'
+    
+    # f = 2 + 2x
+    f = make_expression(scalar_2 + scalar_2 * x, vars = [x])
+    assert f.deriv(4) ==  2, 'Expression derivative error.'
+    assert f.deriv(0) ==  2, 'Expression derivative error.'
+    
+    # f = 2 * sin(x)
+    f = make_expression(scalar_2 * ops.sin(x), vars = [x])
+    assert np.abs( f.deriv(2) - ( 2*np.cos(2))  ) < 1e-7, 'Expression derivative error.'
+    assert np.abs( f.deriv(-2) - ( 2*np.cos(-2))  ) < 1e-7, 'Expression derivative error.'
+    
+    
+    # f = cos(x) + tan(x) * 2
+    f = make_expression(ops.cos(x) + ops.tan(x) * scalar_2, vars = [x])
+    assert np.abs( f.deriv(np.pi) - ( 2*(1/np.cos(np.pi))**2 - np.sin(np.pi))  ) < 1e-7, 'Expression derivative error.'
+    assert np.abs( f.deriv(-np.pi) - (2*(1/np.cos(-np.pi))**2 - np.sin(-np.pi))  ) < 1e-7, 'Expression derivative error.'
+    
+    
+    # f = 2 - log(x)
+    f = make_expression(scalar_2 - ops.log(x), vars = [x])
+    assert np.abs( f.deriv(4) - ( -1/4)) < 1e-7, 'Expression derivative error.'
+    assert np.abs( f.deriv(8) - ( -1/8)) < 1e-7, 'Expression derivative error.'
+    
+     # f = 2 / exp(x)
+    f = make_expression(scalar_2 / ops.exp(x), vars = [x])
+    assert np.abs( f.deriv(4) - ( -2*np.exp(-4))  ) < 1e-7, 'Expression derivative error.'
+    assert np.abs( f.deriv(0) - ( -2*np.exp(0)) ) < 1e-7,  'Expression derivative error.'
+    
+    
 
 x = Var('x')
 y = Var('y')
-
+#scalar_2 = Scalar(2)
 f = make_expression(2+x, vars = [x])
 
 # Var needs .vars attribute or check if Expression is Var for the last single Var
@@ -47,11 +108,5 @@ f = make_expression(2+x, vars = [x])
 #f = Expression(x, y, ops.add, [x,y])
 print(f)
 
-# start testing
-#print('Test variable evaluation:', test_Var_eval())
-#print('Test variable derivative:', test_Var_deriv())
-
-#print('Test expression parents:', test_Exp_parents())
-print('Test expression evaluation:', test_Exp_eval())
 
 
