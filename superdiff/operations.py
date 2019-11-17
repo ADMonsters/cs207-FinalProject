@@ -122,7 +122,9 @@ class Div(BinaryOperation):
 
     @classmethod
     def deriv(cls, num1, deriv1, num2, deriv2):
-        return (num1 * deriv2 - num2 * deriv1) / (num2 ** 2)
+        print(num1,deriv1,num2, deriv2)
+        print((num1 * deriv2 - num2 * deriv1) / (num2 ** 2))
+        return -(num1 * deriv2 - num2 * deriv1) / (num2 ** 2)
 
 
 class Pow(BinaryOperation):

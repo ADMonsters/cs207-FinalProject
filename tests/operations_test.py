@@ -32,7 +32,7 @@ def test_basic_div():
     assert Div.eval(b, a) == 1.5
     assert Div.deriv(a, 0, b, 0) == 0
     assert Div.eval(x(1), y(3)) == 1/3
-    assert Div.deriv(x.eval(4), x.deriv(4), y.eval(2), y.deriv(2)) == 1/2
+    assert Div.deriv(x.eval(4), x.deriv(4), y.eval(2), y.deriv(2)) == -1/2
 
 def test_basic_pow():
     assert Pow.eval(a, b) == 8
