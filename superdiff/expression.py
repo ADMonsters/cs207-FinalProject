@@ -25,7 +25,7 @@ class Var:
 
     """
     def __init__(self, name):
-        self.vars = []
+        self._vars = None
         self.name = name
 
     def eval(self, x):
@@ -52,6 +52,10 @@ class Var:
             return 1
         else:
             return 0
+
+    @property
+    def vars(self):
+        return [self]
 
     def __str__(self):
         return self.name
@@ -108,15 +112,23 @@ class Expression(Var):
         self.parents = [self.parent1, self.parent2]
         self.operation = operation
         if varlist is None:
-            self.vars = self._get_parent_vars(self.parent1)
-            self.vars += [v for v in self._get_parent_vars(self.parent2) if v not in self.vars]
+            self._vars = self._get_parent_vars(self.parent1)
+            self._vars += [v for v in self._get_parent_vars(self.parent2) if v not in self._vars]
         else:
-            self.vars = varlist
+            self._vars = varlist
         self.matched_vars = self._match_vars_to_parents()
 
     def set_vars(self, varlist):
-        self.vars = varlist
+        self._vars = varlist
         self.matched_vars = self._match_vars_to_parents()
+
+    @property
+    def vars(self):
+        return self._vars
+
+    @vars.setter
+    def vars(self, vars):
+        self._vars = vars
 
     def _match_vars_to_parents(self):
         """Matches variables to parent1 and parent2
@@ -171,11 +183,7 @@ class Expression(Var):
         :param args: Arguments in order of self.vars
         :return: list[Var]
         """
-        if isinstance(parent, Var):
-            print(parent)
-            return [args[self.vars.index(parent)]]
-        else:
-            input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
+        input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
         return input_args
 
     def _check_input_length(self, *args):
