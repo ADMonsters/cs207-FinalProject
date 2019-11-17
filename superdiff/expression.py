@@ -8,7 +8,9 @@ Classes:
         - Inherits from Var
         - Can be combined into larger expressions
 """
-from superdiff import operations as ops
+from typing import Union
+
+import superdiff as sd
 
 
 class Var:
@@ -50,34 +52,34 @@ class Var:
         return self.eval(*args)
 
     def __add__(self, other):
-        return ops.add.expr(self, other)
+        return sd.add(self, other)
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        return ops.sub(self, other)
+        return sd.sub(self, other)
 
     def __rsub__(self, other):
-        return ops.sub(other, self)
+        return sd.sub(other, self)
 
     def __mul__(self, other):
-        return ops.mul(self, other)
+        return sd.mul(self, other)
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __div__(self, other):
-        return ops.div(self, other)
+        return sd.div(self, other)
 
     def __rdiv__(self, other):
-        return ops.div(other, self)
+        return sd.div(other, self)
 
     def __pow__(self, power):
-        return ops.pow(self, power)
+        return sd.pow(self, power)
 
     def __rpow__(self, base):
-        return ops.pow(base, self)
+        return sd.pow(base, self)
 
 
 class Expression(Var):
@@ -130,7 +132,7 @@ class Expression(Var):
         :return: Result (length depends on dimensionality of co-domain)
         """
         p1_args, p2_args = self._parse_args(*args)
-        return self.operation.value(self.parent1(*p1_args), self.parent2(*p2_args))
+        return self.operation.eval(self.parent1(*p1_args), self.parent2(*p2_args))
 
     def deriv(self, *args, mode='forward'):
         """Differentiate this Expression at the specified point.
@@ -144,8 +146,8 @@ class Expression(Var):
         """
         p1_args, p2_args = self._parse_args(*args)
         return self.operation.deriv(self.parent1.deriv(*p1_args),
-                                    self.parent2.deriv(*p2_args),
                                     self.parent1(*p1_args),
+                                    self.parent2.deriv(*p2_args),
                                     self.parent2(*p2_args))
 
     def _get_input_args(self, parent, *args):
@@ -156,9 +158,10 @@ class Expression(Var):
         :return: list[Var]
         """
         if isinstance(parent, Var):
-            return (args[self.vars.index(parent)],)
+            return [args[self.vars.index(parent)]]
         else:
-            return [args[self.vars.index(parent_var)] for parent_var in parent.vars]
+            input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
+        return input_args
 
     def _check_input_length(self, *args):
         """Check that the input length matches this function's domain dimensionality.
@@ -181,6 +184,13 @@ class Expression(Var):
         p1_args = self._get_input_args(self.parent1, *args)
         p2_args = self._get_input_args(self.parent2, *args)
         return p1_args, p2_args
+
+    def _get_parent_vars(self, parent: Union):
+        """Get the vars for given parent
+
+        :param parent:
+        :return:
+        """
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args)

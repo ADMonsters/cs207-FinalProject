@@ -1,11 +1,6 @@
-import numpy as np
+from superdiff.expression import Expression, Var
+from superdiff.superdiff import make_expression
+import superdiff.operations as ops
 
-from superdiff import expression as ex
-from superdiff import operations as ops
 
-a, b = 2, 3
-x, y = ex.Var('x'), ex.Var('y')
-f = ex.Expression(x, y, ops.add, [x, y])
-
-print(f._parse_args(1, 3))
-print(f.eval(1, 3))
+print('Did an importo')
