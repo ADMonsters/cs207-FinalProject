@@ -167,7 +167,7 @@ class Expression(Var):
         p1_args, p2_args = self._parse_args(*args)
         res = []
         for var in self.vars:
-            res.append(self.operation.deriv(self._eval_parent(self.parent1, *p1_args),
+            res.append(self.operation.deriv(self._eval_parent(self.parent1, *p1_args), # Evaluate and store once
                                             self._deriv_parent(self.parent1, var, *p1_args),
                                             self._eval_parent(self.parent2, *p2_args),
                                             self._deriv_parent(self.parent2, var, *p2_args)))
@@ -183,6 +183,8 @@ class Expression(Var):
         :param args: Arguments in order of self.vars
         :return: list[Var]
         """
+        if not isinstance(parent, Var):
+            return None
         input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
         return input_args
 
