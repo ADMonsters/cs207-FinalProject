@@ -36,8 +36,12 @@ def pow(expr1, expr2):
     return ops.Pow.expr(expr1, expr2)
 
 
-def log(expr):
-    return ops.Log.expr(expr)
+def log(expr1, expr2):
+    return ops.Log.expr(expr1, expr2)
+
+
+def nlog(expr):
+    return ops.NLog.expr(expr)
 
 
 def sin(expr):

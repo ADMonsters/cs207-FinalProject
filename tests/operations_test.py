@@ -1,62 +1,84 @@
 import pytest
 import numpy as np
-
-# import sys 
-# sys.path.append('..')
+import math
 
 from superdiff.operations import *
 from superdiff.expression import *
 
 # Asserts to ensure correct output with basic inputs
 a, b = 2, 3
-node_a, node_b = Var("x"), Var("y")
+x, y = Var("x"), Var("y")
 
 def test_basic_add():
-    assert add.value(a, b) == 5
-    assert add.deriv(a,b) == 0
-    assert add.value(node_a(4), node_b(5)) == 9
-    # assert add.deriv(node_a.deriv(4), node_b.deriv(5)) == 2
+    assert Add.eval(a, b) == 5
+    assert Add.deriv(a, 0, b, 0) == 0
+    assert Add.eval(x(4), y(5)) == 9
+    assert Add.deriv(x.eval(3), x.deriv(3), y.eval(2), y.deriv(2)) == 2
 
 def test_basic_sub():
-    assert sub.value(b, a) == 1
-    assert sub.deriv(b, a) == 0
-    assert sub.value(node_a(5), node_b(4)) == 1
-    # assert sub.deriv(node_a.deriv(4), node_b.deriv(5)) == 0
+    assert Sub.eval(b, a) == 1
+    assert Sub.deriv(b, 0, a, 0) == 0
+    assert Sub.eval(x(5), y(4)) == 1
+    assert Sub.deriv(x.eval(3), x.deriv(2), y.eval(3), y.deriv(3)) == 0
 
 def test_basic_mul():
-    assert mul.value(a, b) == 6
-    assert mul.deriv(a, b) == 0
-    assert mul.value(node_a(5), node_b(4)) == 20
-    # assert mul.deriv(node_a.deriv(4), node_b.deriv(5)) == 1
+    assert Mul.eval(a, b) == 6
+    assert Mul.deriv(a, 0, b, 0) == 0
+    assert Mul.eval(x(5), y(4)) == 20
+    assert Mul.deriv(x.eval(2), x.deriv(2), y.eval(3), y.deriv(3)) == 5
 
 def test_basic_div():
-    assert div.value(b, a) == 1.5
-    assert div.deriv(a, b) == 0
-    assert div.value(node_a(1), node_b(3)) == 1/3
-    # assert div.deriv(node_a(1), node_b(3)) == 2/9
-    # node_a(1) returns number, so div.deriv() treats it like constant though it's a variable
-    # deriv() in Expression needs to be compatible so operations don't get confused
-
-def test_basic_exp():
-    assert exp.value(a) == np.e**a
-    # assert exp.deriv(node_a(2)) == np.exp(a)
-
-def test_basic_log():
-    assert log.value(a) == np.log(a)
-    # assert log.deriv(node_a(1)) == 1/node_a(1)
+    assert Div.eval(b, a) == 1.5
+    assert Div.deriv(a, 0, b, 0) == 0
+    assert Div.eval(x(1), y(3)) == 1/3
+    assert Div.deriv(x.eval(4), x.deriv(4), y.eval(2), y.deriv(2)) == 1/2
 
 def test_basic_pow():
-    # assert pow(node_a, node_b)(2,3) == 2**3
-    pass
+    assert Pow.eval(a, b) == 8
+    assert Pow.deriv(a, 0, b, 0) == 0
+    assert Pow.eval(x.eval(2), y.eval(2)) == 4
+    # Derivative of x^3 --> 3x^2 --> evaluate at x = 4 --> 48
+    assert math.ceil(Pow.deriv(x.eval(4), x.deriv(4), 3, 0)) == 48
 
-def sin():
-    assert sin.value(node_a(np.pi)) == 0
+def test_basic_exp():
+    assert Exp.eval(a) == np.exp(a)
+    assert Exp.deriv(a, 0) == 0
+    assert Exp.eval(x.eval(3)) == np.exp(3)
+    assert Exp.deriv(x.eval(3), x.deriv(3)) == np.exp(3)
 
-def cos():
-    assert cos.value(node_a(np.pi)) == -1
+def test_basic_nlog():
+    assert NLog.eval(a) == np.log(a)
+    assert NLog.deriv(a, 0) == 0
+    assert NLog.eval(x(1)) == np.log(x(1))
+    assert NLog.deriv(x(1), x.deriv(1)) == 1/x(1)
 
-def tan():
-    assert tan.value(node_a(np.pi)/4) == 1
+def test_basic_log():
+    assert Log.eval(b, a) == np.log(b) / np.log(a) 
+    assert Log.deriv(b, 0, a, 0) == 0
+    assert Log.eval(x(2), x(10)) == np.log(2) / np.log(10)
+    assert Log.deriv(x.eval(10), x.deriv(10), 2, 0) == 1 / (10 * np.log(2))
+
+def test_basic_sin():
+    assert math.floor(Sin.eval(x(np.pi))) == 0
+    assert Sin.deriv(x(np.pi), x.deriv(np.pi)) == -1
+
+def test_basic_cos():
+    assert math.floor(Cos.eval(x(np.pi))) == -1
+    assert math.ceil(Cos.deriv(x(np.pi), x.deriv(np.pi))) == 0
+
+def test_basic_tan():
+    assert math.ceil(Tan.eval(x(np.pi)/4)) == 1
+    assert math.ceil(Tan.deriv(x(np.pi/3), x.deriv(np.pi/3))) == 4
+
+f_add = Expression(x, y, Add, [x, y])
+def test_add_expr():
+    assert f_add.eval(1,3) == 4
+    assert f_add.deriv(1,3) == 2
+
+f_sub = Expression(x, y, Sub, [x, y])
+def test_sub_expr():
+    assert f_sub.eval(3,1) == 2
+    assert f_sub.deriv(3,1) == 0
 
 # error handling and corner cases
 string_a = "H"

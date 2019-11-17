@@ -102,6 +102,8 @@ class Expression(Var):
         if varlist is None:
             self.vars = parent1.vars[:]
             self.vars += [v for v in parent2.vars if v not in parent1.vars]
+        else:
+            self.vars = varlist
         self.matched_vars = self._match_vars_to_parents()
 
     def set_vars(self, varlist):
@@ -143,10 +145,10 @@ class Expression(Var):
         :return: Result (length depends on dimensionality of co-domain)
         """
         p1_args, p2_args = self._parse_args(*args)
-        return self.operation.deriv(self.parent1.deriv(*p1_args),
-                                    self.parent1(*p1_args),
-                                    self.parent2.deriv(*p2_args),
-                                    self.parent2(*p2_args))
+        return self.operation.deriv(self.parent1(*p1_args),
+                                    self.parent1.deriv(*p1_args),
+                                    self.parent2(*p2_args),
+                                    self.parent2.deriv(*p2_args))
 
     def _get_input_args(self, parent, *args):
         """Parse the arguments in terms of the ordering for the parent
