@@ -35,6 +35,9 @@ def div(expr1, expr2):
 def pow(expr1, expr2):
     return ops.Pow.expr(expr1, expr2)
 
+def exp(expr):
+    return ops.Exp.expr(expr)
+
 
 def log(expr1, expr2):
     return ops.Log.expr(expr1, expr2)

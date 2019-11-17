@@ -4,6 +4,7 @@ import math
 
 from superdiff.operations import *
 from superdiff.expression import *
+from superdiff.superdiff import *
 
 # Asserts to ensure correct output with basic inputs
 a, b = 2, 3
@@ -70,21 +71,48 @@ def test_basic_tan():
     assert math.ceil(Tan.eval(x(np.pi)/4)) == 1
     assert math.ceil(Tan.deriv(x(np.pi/3), x.deriv(np.pi/3))) == 4
 
-f_add = Expression(x, y, Add, [x, y])
 def test_add_expr():
+    f_add = Expression(x, y, Add, [x, y])
     assert f_add.eval(1,3) == 4
     assert f_add.deriv(1,3) == (1,1)
 
-f_sub = Expression(x, y, Sub, [x, y])
 def test_sub_expr():
+    f_sub = Expression(x, y, Sub, [x, y])
     assert f_sub.eval(3,1) == 2
     assert f_sub.deriv(3,1) == (1,-1)
 
 z = Var("z")
-f_add3 = Expression(x+y, z, Add, [x,y,z])
+# f_add3 = Expression(x+y, z, Add, [x,y,z])
 def test_add_expr3():
-    assert f_add3.eval(1,2,3) == 6
-    assert f_add3.deriv(1,2,3) == (1,1,1)
+    f_add3 = make_expression(x+x+x, vars=[x])
+    assert f_add3.eval(1) == 3
+    assert f_add3.deriv(1) == 3
+
+def test_mul_expr():
+    f_num = make_expression(2*x, vars=[x])
+    assert f_num.eval(2) == 4
+    assert f_num.deriv(2) == 2
+
+def test_mul_const_expr():
+    f_num2 = make_expression(2*x + 1, vars=[x])
+    assert f_num2.eval(5) == 11
+    assert f_num2.deriv(5) == 2
+
+def test_pow_expr():
+    f_pow = make_expression(x**2, vars=[x])
+    assert f_pow.eval(5) == 25
+    assert f_pow.deriv(5) == 10
+
+def test_pow_stress():
+    f_pow_stress = make_expression(x**(sin(x)), vars=[x])
+    assert f_pow_stress.eval(np.pi / 6) == (np.pi / 6)**(1/2)
+
+# def test_sin():
+    
+
+
+
+# Diabolical functions
 
 
 # error handling and corner cases
