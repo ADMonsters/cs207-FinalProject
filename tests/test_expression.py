@@ -3,6 +3,7 @@ test_expression.py
 
 Testing methods in class Var and Expression
 """
+import pytest
 import numpy as np
 from superdiff import make_expression
 from superdiff.expression import *
@@ -94,17 +95,4 @@ def test_Exp_deriv():
     assert np.abs( f.deriv(4) - ( -2*np.exp(-4))  ) < 1e-7, 'Expression derivative error.'
     assert np.abs( f.deriv(0) - ( -2*np.exp(0)) ) < 1e-7,  'Expression derivative error.'
     
-    
-
-x = Var('x')
-y = Var('y')
-#scalar_2 = Scalar(2)
-f = make_expression(2+x, vars = [x])
-
-# Var needs .vars attribute or check if Expression is Var for the last single Var
-# Also what to do with numbers like f = 2*x, 2 does not have varlist
-#f = Expression(x, y, ops.add, [x,y])
-print(f)
-
-
 
