@@ -50,6 +50,8 @@ class Var:
         """
         if x:
             return 1
+        elif x == 0:
+            return 1
         else:
             return 0
 
@@ -81,10 +83,10 @@ class Var:
     def __rmul__(self, other):
         return self.__mul__(other)
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         return sd.div(self, other)
 
-    def __rdiv__(self, other):
+    def __rtruediv__(self, other):
         return sd.div(other, self)
 
     def __pow__(self, power):
@@ -188,6 +190,8 @@ class Expression(Var):
         for var in self.vars:
             res.append(self.operation.deriv(self._eval_parent(self.parent1, *args),
                                             self._deriv_parent(self.parent1, var, *args)))
+
+        return res
 
     def _binary_deriv(self, *args, mode='forward'):
         p1_args, p2_args = self._parse_args(*args)
