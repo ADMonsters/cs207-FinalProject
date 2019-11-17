@@ -184,7 +184,7 @@ class Expression(Var):
         :return: list[Var]
         """
         if not isinstance(parent, Var):
-            return None
+            return []
         input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
         return input_args
 
