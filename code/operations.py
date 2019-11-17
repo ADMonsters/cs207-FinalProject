@@ -1,6 +1,6 @@
 import numpy as np
 from numbers import Number
-from superdiff.expression import *
+from superdiff import Var
 
 def checktype(x):
     '''
@@ -30,7 +30,7 @@ class add():
         return left_der + right_der
 
 
-class sub():
+class sub(Binary):
     
     @staticmethod
     def expr(left, right): # this method makes an Expression
