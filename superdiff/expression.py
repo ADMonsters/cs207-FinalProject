@@ -151,8 +151,11 @@ class Expression(Var):
         :param args: tuple of values to evaluate the Expression at
         :return: Result (length depends on dimensionality of co-domain)
         """
-        p1_args, p2_args = self._parse_args(*args)
-        return self.operation.eval(self._eval_parent(self.parent1, *p1_args), self._eval_parent(self.parent2, *p2_args))
+        if self.parent2 is None:
+            return self._unary_eval(*args)
+        else:
+            return self._binary_eval(*args)
+
 
     def deriv(self, *args, mode='forward'):
         """Differentiate this Expression at the specified point.
@@ -175,6 +178,13 @@ class Expression(Var):
             return res[0]
         else:
             return tuple(res)
+
+    def _unary_eval(self, *args):
+        return self.operation.eval(self._eval_parent(self.parent1, *args))
+
+    def _binary_eval(self, *args):
+        p1_args, p2_args = self._parse_args(*args)
+        return self.operation.eval(self._eval_parent(self.parent1, *p1_args), self._eval_parent(self.parent2, *p2_args))
 
     def _get_input_args(self, parent, *args):
         """Parse the arguments in terms of the ordering for the parent
