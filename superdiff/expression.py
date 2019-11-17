@@ -242,8 +242,6 @@ class Expression(Var):
         """
         if parent is None or isinstance(parent, Number):
             return []
-        elif isinstance(parent, Var):
-            return [parent]
         else:
             return parent.vars[:]
 
