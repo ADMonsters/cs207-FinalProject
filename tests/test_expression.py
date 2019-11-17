@@ -50,7 +50,7 @@ def test_Exp_eval():
     assert np.abs( f.eval(0) - (np.cos(0) + np.tan(0) * 2 )  ) < 1e-7, 'Expression evaluation error.'
     
     # f = 2 - log(x)
-    f = make_expression(2 - sd.log(x), vars = [x])
+    f = make_expression(2 - sd.log(x,np.e), vars = [x])
     assert np.abs( f.eval(8) - (2 - np.log(8) )  ) < 1e-7, 'Expression evaluation error.'
     assert np.abs( f.eval(4) - (2 - np.log(4) )  ) < 1e-7, 'Expression evaluation error.'
     
@@ -85,7 +85,7 @@ def test_Exp_deriv():
     assert np.abs( f.deriv(np.pi) - ( 2*(1/np.cos(np.pi))**2 - np.sin(np.pi))  ) < 1e-7, 'Expression derivative error.'
     assert np.abs( f.deriv(-np.pi) - (2*(1/np.cos(-np.pi))**2 - np.sin(-np.pi))  ) < 1e-7, 'Expression derivative error.'
     
-    
+
     # f = 2 - log(x)
     f = make_expression(2 - sd.log(x), vars = [x])
     assert np.abs( f.deriv(4) - ( -1/4)) < 1e-7, 'Expression derivative error.'
@@ -97,3 +97,4 @@ def test_Exp_deriv():
     assert np.abs( f.deriv(0) - ( -2*np.exp(0)) ) < 1e-7,  'Expression derivative error.'
     
 
+test_Exp_eval()
