@@ -1,6 +1,7 @@
 from typing import Union
 
 from superdiff.expression import Expression, Var
+from superdiff import operations as ops
 
 
 def make_expression(expr: Union[Var, Expression], vars=None) -> Expression:
@@ -12,3 +13,40 @@ def make_expression(expr: Union[Var, Expression], vars=None) -> Expression:
     if vars is not None:
         expr.set_vars(vars)
     return expr
+
+
+# Operations
+def add(expr1, expr2):
+    return ops.Add.expr(expr1, expr2)
+
+
+def sub(expr1, expr2):
+    return ops.Sub.expr(expr1, expr2)
+
+
+def mul(expr1, expr2):
+    return ops.Mul.expr(expr1, expr2)
+
+
+def div(expr1, expr2):
+    return ops.Div.expr(expr1, expr2)
+
+
+def pow(expr1, expr2):
+    return ops.Pow.expr(expr1, expr2)
+
+
+def log(expr):
+    return ops.Log.expr(expr)
+
+
+def sin(expr):
+    return ops.Sin.expr(expr)
+
+
+def cos(expr):
+    return ops.Cos.expr(expr)
+
+
+def tan(expr):
+    return ops.Tan.expr(expr)
