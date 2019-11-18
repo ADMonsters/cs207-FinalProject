@@ -19,8 +19,8 @@ class BaseOperation:
         :raises: AssertionError if all elements of args are not a Var or Number
         """
         for x in args:
-            assert isinstance(x, Var) or isinstance(x, Number), "Not a number/Variable/Expression"
-
+            if not isinstance(x, Var) and not isinstance(x, Number):
+                raise TypeError("Not a number/Variable/Expression")
 
 class UnaryOperation(BaseOperation):
     @classmethod
