@@ -18,7 +18,9 @@ class BaseOperation:
         :return: None
         :raises: AssertionError if `x` is not a Var or Number
         """
-        assert isinstance(x, Var) or isinstance(x, Number), "Not a number/Variable/Expression"
+        if not isinstance(x, Var) and not isinstance(x, Number):
+            raise TypeError("Not a number/Variable/Expression")
+        # assert isinstance(x, Var) or isinstance(x, Number), "Not a number/Variable/Expression"
 
 
 class UnaryOperation(BaseOperation):
@@ -29,6 +31,7 @@ class UnaryOperation(BaseOperation):
         :param expr: Var | Number -- Parent expression
         :return: Var | Number -- new expression
         """
+        super().check_type(expr)
         return Expression(expr, None, cls)
 
     @classmethod
@@ -60,6 +63,8 @@ class BinaryOperation(BaseOperation):
         :param expr2: Var | Number -- Expression or number to become parent 2
         :return:
         """
+        super().check_type(expr1)
+        super().check_type(expr2)
         return Expression(expr1, expr2, cls)
 
     @classmethod
@@ -88,6 +93,8 @@ class BinaryOperation(BaseOperation):
 class Add(BinaryOperation):
     @classmethod
     def eval(cls, num1, num2):
+        # super().check_type(num1)
+        # super().check_type(num2)
         return num1 + num2
 
     @classmethod
@@ -192,3 +199,30 @@ class Tan(UnaryOperation):
     @classmethod
     def deriv(cls, val, der):
         return der / (np.cos(val) ** 2)
+
+class Csc(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return 1/np.sin(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return -der*(1/np.sin(val))*(1/np.tan(val))
+
+class Sec(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return 1/np.cos(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return der*(1/np.cos(val))*np.tan(val)
+
+class Cot(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return 1/np.tan(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return -der*(1/np.sin(val))**2
