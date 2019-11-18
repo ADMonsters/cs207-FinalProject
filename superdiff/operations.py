@@ -19,8 +19,8 @@ class BaseOperation:
         :raises: AssertionError if all elements of args are not a Var or Number
         """
         for x in args:
-            assert isinstance(x, Var) or isinstance(x, Number), "Not a number/Variable/Expression"
-
+            if not isinstance(x, Var) and not isinstance(x, Number):
+                raise TypeError("Not a number/Variable/Expression")
 
 class UnaryOperation(BaseOperation):
     @classmethod
@@ -91,6 +91,8 @@ class BinaryOperation(BaseOperation):
 class Add(BinaryOperation):
     @classmethod
     def eval(cls, num1, num2):
+        # super().check_type(num1)
+        # super().check_type(num2)
         return num1 + num2
 
     @classmethod
@@ -159,11 +161,11 @@ class NLog(UnaryOperation):
 
 class Log(BinaryOperation):
     @classmethod
-    def eval(cls, num, base):
+    def eval(cls, num, base = np.e):
         return np.log(num) / np.log(base)
 
     @classmethod
-    def deriv(cls, val, der, base, base_der):
+    def deriv(cls, val, der, base = np.e, base_der = 0):
         return (((der / val) * np.log(base)) - ((base_der / base) * np.log(val))) / (np.log(base)**2)
 
 
@@ -195,3 +197,30 @@ class Tan(UnaryOperation):
     @classmethod
     def deriv(cls, val, der):
         return der / (np.cos(val) ** 2)
+
+class Csc(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return 1/np.sin(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return -der*(1/np.sin(val))*(1/np.tan(val))
+
+class Sec(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return 1/np.cos(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return der*(1/np.cos(val))*np.tan(val)
+
+class Cot(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return 1/np.tan(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return -der*(1/np.sin(val))**2

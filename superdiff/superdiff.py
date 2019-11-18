@@ -1,5 +1,5 @@
 from typing import Union
-
+import numpy as np
 from superdiff.expression import Expression, Var
 from superdiff import operations as ops
 
@@ -35,11 +35,12 @@ def div(expr1, expr2):
 def pow(expr1, expr2):
     return ops.Pow.expr(expr1, expr2)
 
+
 def exp(expr):
     return ops.Exp.expr(expr)
 
 
-def log(expr1, expr2):
+def log(expr1, expr2 = np.e):
     return ops.Log.expr(expr1, expr2)
 
 
@@ -57,3 +58,15 @@ def cos(expr):
 
 def tan(expr):
     return ops.Tan.expr(expr)
+
+
+def csc(expr):
+    return ops.Csc.expr(expr)
+
+
+def sec(expr):
+    return ops.Sec.expr(expr)
+
+
+def cot(expr):
+    return ops.Cot.expr(expr)

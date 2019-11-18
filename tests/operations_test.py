@@ -81,22 +81,40 @@ def test_sub_expr():
     assert f_sub.eval(3,1) == 2
     assert f_sub.deriv(3,1) == (1,-1)
 
-z = Var("z")
-# f_add3 = Expression(x+y, z, Add, [x,y,z])
 def test_add_expr3():
     f_add3 = make_expression(x+x+x, vars=[x])
     assert f_add3.eval(1) == 3
     assert f_add3.deriv(1) == 3
 
 def test_mul_expr():
-    f_num = make_expression(2*x, vars=[x])
-    assert f_num.eval(2) == 4
-    assert f_num.deriv(2) == 2
+    f_mul = make_expression(-2*x, vars=[x])
+    assert f_mul.eval(2) == -4
+    assert f_mul.deriv(2) == -2
 
 def test_mul_const_expr():
-    f_num2 = make_expression(2*x + 1, vars=[x])
-    assert f_num2.eval(5) == 11
-    assert f_num2.deriv(5) == 2
+    f_mul2 = make_expression(2*x + 1, vars=[x])
+    assert f_mul2.eval(5) == 11
+    assert f_mul2.deriv(5) == 2
+
+def test_mul_expr_stress():
+    f_mul3 = make_expression(2*log(x)+1, vars=[x])
+    assert f_mul3.eval(np.e) == 3
+    assert f_mul3.deriv(np.e) == 2/np.e
+
+def test_div_expr():
+    f_div = make_expression(x/5, vars=[x])
+    assert f_div.eval(5) == 1
+    assert f_div.deriv(5) == 1/5
+
+def test_div_const_expr():
+    f_div2 = make_expression(2/x + 2, vars=[x])
+    assert f_div2.eval(2) == 3
+    assert f_div2.deriv(2) == -1/2
+
+def test_div_expr_stress():
+    f_div3 = make_expression(2/sin(x) + 3/cos(x), vars=[x])
+    assert f_div3.eval(np.pi/6) == (2/np.sin(np.pi/6)) + (3/np.cos(np.pi/6))
+    assert f_div3.deriv(np.pi/6) - (-2*(1/np.tan(np.pi/6))*(1/np.sin(np.pi/6))) - (3*(1/np.cos(np.pi/6))*np.tan(np.pi/6)) < 1e-3
 
 def test_pow_expr():
     f_pow = make_expression(x**2, vars=[x])
@@ -106,20 +124,37 @@ def test_pow_expr():
 def test_pow_stress():
     f_pow_stress = make_expression(x**(sin(x)), vars=[x])
     assert f_pow_stress.eval(np.pi / 6) == (np.pi / 6)**(1/2)
-
-# def test_sin():
+    assert f_pow_stress.deriv(np.pi / 6) == ((np.sin(np.pi / 6) / (np.pi / 6)) + np.log(np.pi / 6)*np.cos(np.pi / 6))*(np.pi / 6)**(1/2)
     
+def test_log_expr():
+    # Natural log -- default
+    f_nlog = make_expression(log(x), vars=[x])
+    assert f_nlog.eval(np.e) == 1
+    assert f_nlog.deriv(np.e) == 1/np.e
 
+    # Custom log -- base 10
+    f_tlog = make_expression(log(x, 10), vars=[x])
+    assert f_tlog.eval(100) == 2
+    assert f_tlog.deriv(100) == 1 / (100*np.log(10))
 
 
 # Diabolical functions
 
 
-# error handling and corner cases
+# Types
 string_a = "H"
 string_b = "I"
-
-# def test_add_types():
-#     with pytest.raises(TypeError):
-#         add.value(string_a, string_b)
+random_list = [1, 3, "H"]
+def test_types():
+    with pytest.raises(TypeError):
+        add(string_a, string_b)
+    with pytest.raises(TypeError):
+        sub(string_a, string_b)
+    with pytest.raises(TypeError):
+        mul(string_a, string_b)
+    with pytest.raises(TypeError):
+        div(string_a, string_b)
+    with pytest.raises(TypeError):
+        div(string_a, random_list)
+    
 
