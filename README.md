@@ -10,3 +10,5 @@
 - Mark Miao
 - Zhenru Wang
 - Kidus Negesse
+
+## A guide for using this package can be found in docs/milestone2.ipynb
