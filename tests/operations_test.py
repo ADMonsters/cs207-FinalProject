@@ -89,9 +89,9 @@ def test_add_expr3():
     assert f_add3.deriv(1) == 3
 
 def test_mul_expr():
-    f_num = make_expression(2*x, vars=[x])
-    assert f_num.eval(2) == 4
-    assert f_num.deriv(2) == 2
+    f_num = make_expression(-2*x, vars=[x])
+    assert f_num.eval(2) == -4
+    assert f_num.deriv(2) == -2
 
 def test_mul_const_expr():
     f_num2 = make_expression(2*x + 1, vars=[x])

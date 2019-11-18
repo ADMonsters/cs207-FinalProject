@@ -156,11 +156,11 @@ class NLog(UnaryOperation):
 
 class Log(BinaryOperation):
     @classmethod
-    def eval(cls, num, base):
+    def eval(cls, num, base = np.e):
         return np.log(num) / np.log(base)
 
     @classmethod
-    def deriv(cls, val, der, base, base_der):
+    def deriv(cls, val, der, base = np.e, base_der = 0):
         return (((der / val) * np.log(base)) - ((base_der / base) * np.log(val))) / (np.log(base)**2)
 
 
