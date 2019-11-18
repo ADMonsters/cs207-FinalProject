@@ -12,15 +12,14 @@ class BaseOperation:
     __metaclass__ = OperationType
 
     @classmethod
-    def check_type(cls, x):
+    def check_type(cls, *args):
         """
-        :param x: Object -- Parameter to check
+        :param args: tuple(Object) -- Parameters to check
         :return: None
-        :raises: AssertionError if `x` is not a Var or Number
+        :raises: AssertionError if all elements of args are not a Var or Number
         """
-        if not isinstance(x, Var) and not isinstance(x, Number):
-            raise TypeError("Not a number/Variable/Expression")
-        # assert isinstance(x, Var) or isinstance(x, Number), "Not a number/Variable/Expression"
+        for x in args:
+            assert isinstance(x, Var) or isinstance(x, Number), "Not a number/Variable/Expression"
 
 
 class UnaryOperation(BaseOperation):
@@ -31,7 +30,7 @@ class UnaryOperation(BaseOperation):
         :param expr: Var | Number -- Parent expression
         :return: Var | Number -- new expression
         """
-        super().check_type(expr)
+        cls.check_type(expr)
         return Expression(expr, None, cls)
 
     @classmethod
@@ -63,8 +62,7 @@ class BinaryOperation(BaseOperation):
         :param expr2: Var | Number -- Expression or number to become parent 2
         :return:
         """
-        super().check_type(expr1)
-        super().check_type(expr2)
+        cls.check_type(expr1, expr2)
         return Expression(expr1, expr2, cls)
 
     @classmethod
