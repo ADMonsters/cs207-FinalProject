@@ -14,12 +14,12 @@ import math
 def test_Var_eval():
     x = Var('x')
     assert x.eval(2) ==  2, 'Variable evaluation error.'
-    assert x.eval(4) ==  4, 'Variable evaluation error.'
+    assert x.eval(0) ==  0, 'Variable evaluation error.'
 
 def test_Var_deriv():
     x = Var('x')
     assert x.deriv(2) ==  1, 'Initial derivative of variable is not 1.'
-    assert x.deriv(4) ==  1, 'Initial derivative of variable is not 1.'
+    assert x.deriv(0) ==  1, 'Initial derivative of variable is not 1.'
     
 def test_Exp_parents():
     x = Var('x')
@@ -56,10 +56,20 @@ def test_Exp_eval():
     assert np.abs( f.eval(4) - (2 - np.log(4) )  ) < 1e-7, 'Expression evaluation error.'
     
     # f = 2 / exp(x)
-    # f = make_expression(2/x, vars = [x])
-    # assert np.abs( f.eval(4) - np.log(4)/4 ) < 1e-7, 'Expression evaluation error.'
-    # assert np.abs( f.eval(10) - np.log(10)/2 ) < 1e-7, 'Expression evaluation error.'
+    f = make_expression(2/sd.exp(x), vars = [x])
+    assert np.abs( f.eval(4) - 2/np.exp(4) ) < 1e-7, 'Expression evaluation error.'
+    assert np.abs( f.eval(10) -  2/np.exp(10) ) < 1e-7, 'Expression evaluation error.'
     
+    # f = 2^x - sec(x)
+    f = make_expression(sd.pow(2,x) - sd.sec(x), vars = [x])
+    assert np.abs( f.eval(np.pi) - (math.pow(2,np.pi) - 1/np.cos(np.pi)) ) < 1e-7, 'Expression evaluation error.'
+    assert np.abs( f.eval(-np.pi) - (math.pow(2,-np.pi) - 1/np.cos(-np.pi)) ) < 1e-7, 'Expression evaluation error.'
+    
+    # f = csc(x) - cot(x)
+    f = make_expression(sd.csc(x) - sd.cot(x), vars = [x])
+    assert np.abs( f.eval(np.pi/2) - (1/np.sin(np.pi/2) - 1/np.tan(np.pi/2)) ) < 1e-7, 'Expression evaluation error.'
+    assert np.abs( f.eval(-np.pi/2) - (1/np.sin(-np.pi/2) - 1/np.tan(-np.pi/2)) ) < 1e-7, 'Expression evaluation error.'
+
     
 
 def test_Exp_deriv():
@@ -97,5 +107,12 @@ def test_Exp_deriv():
     assert math.floor(np.abs( f.deriv(4) - ( -2*np.exp(-4))  )) < 1e-7, 'Expression derivative error.'
     assert np.abs( f.deriv(0) - ( -2*np.exp(0)) ) < 1e-7,  'Expression derivative error.'
     
+    # f = 2^x - sec(x)
+    f = make_expression(sd.pow(2,x) - sd.sec(x), vars = [x])
+    assert np.abs( f.deriv(np.pi) - (math.pow(2,np.pi)*np.log(2) - np.tan(np.pi) * 1/np.cos(np.pi)) ) < 1e-7, 'Expression derivative error.'
+    assert np.abs( f.deriv(-np.pi) - (math.pow(2,-np.pi)*np.log(2) - np.tan(-np.pi) * 1/np.cos(-np.pi)) ) < 1e-7, 'Expression derivative error.'
 
-# test_Exp_eval()
+    # f = csc(x) - cot(x)
+    f = make_expression(sd.csc(x) - sd.cot(x), vars = [x])
+    assert np.abs( f.deriv(np.pi/2) - (1/np.sin(np.pi/2)*(1/np.sin(np.pi/2) - 1/np.tan(np.pi/2) )) ) < 1e-7, 'Expression derivative error.'
+    assert np.abs( f.deriv(-np.pi/2) - (1/np.sin(-np.pi/2)*(1/np.sin(-np.pi/2) - 1/np.tan(-np.pi/2) )) ) < 1e-7, 'Expression derivative error.'
