@@ -22,6 +22,7 @@ class BaseOperation:
             if not isinstance(x, Var) and not isinstance(x, Number):
                 raise TypeError("Not a number/Variable/Expression")
 
+
 class UnaryOperation(BaseOperation):
     @classmethod
     def expr(cls, expr):
@@ -139,6 +140,7 @@ class Pow(BinaryOperation):
     def deriv(cls, num1, deriv1, num2, deriv2):
         return np.exp(num2 * np.log(num1)) * (deriv2 * np.log(num1) + num2 * deriv1 / num1)
 
+
 class Exp(UnaryOperation):
     @classmethod
     def eval(cls, num):
@@ -147,6 +149,7 @@ class Exp(UnaryOperation):
     @classmethod
     def deriv(cls, num, deriv):
         return deriv*np.exp(num)
+
 
 class NLog(UnaryOperation):
     @classmethod
@@ -157,13 +160,14 @@ class NLog(UnaryOperation):
     def deriv(cls, val, der):
         return der / val
 
+
 class Log(BinaryOperation):
     @classmethod
-    def eval(cls, num, base = np.e):
+    def eval(cls, num, base=np.e):
         return np.log(num) / np.log(base)
 
     @classmethod
-    def deriv(cls, val, der, base = np.e, base_der = 0):
+    def deriv(cls, val, der, base=np.e, base_der=0):
         return (((der / val) * np.log(base)) - ((base_der / base) * np.log(val))) / (np.log(base)**2)
 
 
@@ -196,6 +200,7 @@ class Tan(UnaryOperation):
     def deriv(cls, val, der):
         return der / (np.cos(val) ** 2)
 
+
 class Csc(UnaryOperation):
     @classmethod
     def eval(cls, num):
@@ -204,6 +209,7 @@ class Csc(UnaryOperation):
     @classmethod
     def deriv(cls, val, der):
         return -der*(1/np.sin(val))*(1/np.tan(val))
+
 
 class Sec(UnaryOperation):
     @classmethod
@@ -214,6 +220,7 @@ class Sec(UnaryOperation):
     def deriv(cls, val, der):
         return der*(1/np.cos(val))*np.tan(val)
 
+
 class Cot(UnaryOperation):
     @classmethod
     def eval(cls, num):
@@ -222,3 +229,14 @@ class Cot(UnaryOperation):
     @classmethod
     def deriv(cls, val, der):
         return -der*(1/np.sin(val))**2
+
+
+# Vector operations
+class Dot(BinaryOperation):
+    @classmethod
+    def eval(cls, vec1, vec2):
+        return np.dot(vec1, vec2)
+
+    @classmethod
+    def deriv(cls, vec1, deriv1, vec2, deriv2):
+        return np.dot(vec1, deriv2) + np.dot(deriv1, vec2)

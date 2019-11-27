@@ -285,3 +285,13 @@ class Expression(Var):
     def __str__(self):
         # TODO: Make this more informative
         return f'{str(self.operation)}: ({str(self.parent1)}, {str(self.parent2)})'
+
+
+# Vector-valued functions and expressions
+class VectorVar(Var):
+    def __init__(self, name, length):
+        super(VectorVar, self).__init__(name)
+        self.length = length
+
+    def dot(self, other):
+        return sd.dot(self, other)
