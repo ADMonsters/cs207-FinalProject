@@ -11,6 +11,8 @@ Classes:
 from typing import Union
 from numbers import Number
 
+import numpy as np
+
 import superdiff as sd
 
 
@@ -24,9 +26,10 @@ class Var:
         eval () -> Number -- Evaluate the variable for a given input (always return the number itself)
 
     """
-    def __init__(self, name):
+    def __init__(self, name, length=1):
         self._vars = None
         self.name = name
+        self.length = length
 
     def eval(self, x):
         """
@@ -37,7 +40,7 @@ class Var:
         """
         return x
 
-    def deriv(self, x: Union[bool, Number]) -> Number:
+    def deriv(self, x: Union[bool, Number], var=None) -> Number:
         """Evaluate the derivative of this variable.
 
         `x` is a boolean indicator variable
@@ -46,11 +49,10 @@ class Var:
 
         :param x: bool | Number -- Whether the derivative is being taken with
             respect to this variable
+        :param var: Var -- The variable with respect to which the derivative is being taken
         :return: int -- 1 or 0
         """
-        if x:
-            return 1
-        elif x == 0:
+        if x is not None:
             return 1
         else:
             return 0
@@ -58,6 +60,9 @@ class Var:
     @property
     def vars(self):
         return [self]
+
+    def __repr__(self):
+        return self.name
 
     def __str__(self):
         return self.name
@@ -95,6 +100,9 @@ class Var:
     def __rpow__(self, base):
         return sd.pow(base, self)
 
+    def dot(self, other):
+        return sd.dot(self, other)
+
 
 class Expression(Var):
     def __init__(self, parent1, parent2, operation, varlist=None):
@@ -104,7 +112,7 @@ class Expression(Var):
         :param parent1: First parent Expression
         :param parent2: Second parent Expression
         :param operation: Operation to combine the two parents
-        :param varlist: Varlist
+        :param varlist: List of Var objects
             Must be in the same order in which numbers will be passed in upon
             evaluation or differentiation of the Expression
         """
@@ -129,8 +137,8 @@ class Expression(Var):
         return self._vars
 
     @vars.setter
-    def vars(self, vars):
-        self._vars = vars
+    def vars(self, varlist):
+        self._vars = varlist
 
     def _match_vars_to_parents(self):
         """Matches variables to parent1 and parent2
@@ -158,8 +166,7 @@ class Expression(Var):
         else:
             return self._binary_eval(*args)
 
-
-    def deriv(self, *args, mode='forward'):
+    def deriv(self, *args, mode='forward', var=None):
         """Differentiate this Expression at the specified point.
 
         Currently just runs forward mode.
@@ -167,16 +174,23 @@ class Expression(Var):
         :param args: tuple -- values to evaluate the Expression at
         :param mode: str -- Whether to run in forward or reverse mode
             (possible options: {'forward', 'reverse', 'auto'})
+        :param var: Var -- Variable to take derivative with respect to
+            Default: None (gets entire Jacobian)
         :return: tuple(Number) | Number -- Result (length depends on dimensionality of co-domain)
         """
+        if var is None:
+            res = []
+            for var in self.vars:
+                res.append(self._deriv(var, mode, *args))
+            return np.array(res)
+        else:
+            return self._deriv(var, mode, *args)
+
+    def _deriv(self, var, mode, *args):
         if self.parent2 is None:
-            res = self._unary_deriv(*args, mode=mode)
+            return self._unary_deriv(*args, mode=mode, var=var)
         else:
-            res = self._binary_deriv(*args, mode=mode)
-        if len(res) == 1:
-            return res[0]
-        else:
-            return tuple(res)
+            return self._binary_deriv(*args, mode=mode, var=var)
 
     def _unary_eval(self, *args):
         return self.operation.eval(self._eval_parent(self.parent1, *args))
@@ -185,22 +199,17 @@ class Expression(Var):
         p1_args, p2_args = self._parse_args(*args)
         return self.operation.eval(self._eval_parent(self.parent1, *p1_args), self._eval_parent(self.parent2, *p2_args))
 
-    def _unary_deriv(self, *args, mode='forward'):
-        res = []
-        for var in self.vars:
-            res.append(self.operation.deriv(self._eval_parent(self.parent1, *args),
-                                            self._deriv_parent(self.parent1, var, *args)))
-
+    def _unary_deriv(self, *args, mode='forward', var=None):
+        res = self.operation.deriv(self._eval_parent(self.parent1, *args),
+                                   self._deriv_parent(self.parent1, var, *args))
         return res
 
-    def _binary_deriv(self, *args, mode='forward'):
+    def _binary_deriv(self, *args, mode='forward', var=None):
         p1_args, p2_args = self._parse_args(*args)
-        res = []
-        for var in self.vars:
-            res.append(self.operation.deriv(self._eval_parent(self.parent1, *p1_args),  # Evaluate and store once
-                                            self._deriv_parent(self.parent1, var, *p1_args),
-                                            self._eval_parent(self.parent2, *p2_args),
-                                            self._deriv_parent(self.parent2, var, *p2_args)))
+        res = self.operation.deriv(self._eval_parent(self.parent1, *p1_args),  # Evaluate and store once
+                                   self._deriv_parent(self.parent1, var, *p1_args),
+                                   self._eval_parent(self.parent2, *p2_args),
+                                   self._deriv_parent(self.parent2, var, *p2_args))
         return res
 
     def _get_input_args(self, parent, *args):
@@ -271,13 +280,10 @@ class Expression(Var):
         :param args: Point to differentiate parent at
         :return: Number
         """
-        if isinstance(parent, Number):
-            return 0
-        else:
+        if isinstance(parent, Var):
             if var in parent.vars:
-                return parent.deriv(*args)
-            else:
-                return 0
+                return parent.deriv(*args, var=var)
+        return 0
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args)

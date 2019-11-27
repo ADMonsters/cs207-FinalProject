@@ -70,3 +70,7 @@ def sec(expr):
 
 def cot(expr):
     return ops.Cot.expr(expr)
+
+
+def dot(expr1, expr2):
+    return ops.Dot.expr(expr1, expr2)
