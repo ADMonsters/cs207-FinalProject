@@ -138,7 +138,8 @@ class Pow(BinaryOperation):
 
     @classmethod
     def deriv(cls, num1, deriv1, num2, deriv2):
-        return np.exp(num2 * np.log(num1)) * (deriv2 * np.log(num1) + num2 * deriv1 / num1)
+        result = np.exp(num2 * np.log(num1 + 0j)) * (deriv2 * np.log(num1 + 0j) + num2 * deriv1 / num1)
+        return np.real(result)
 
 
 class Exp(UnaryOperation):
