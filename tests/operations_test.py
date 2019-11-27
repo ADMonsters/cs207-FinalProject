@@ -74,12 +74,12 @@ def test_basic_tan():
 def test_add_expr():
     f_add = Expression(x, y, Add, [x, y])
     assert f_add.eval(1,3) == 4
-    assert f_add.deriv(1,3) == (1,1)
+    assert np.all(f_add.deriv(1,3) == [1,1])
 
 def test_sub_expr():
     f_sub = Expression(x, y, Sub, [x, y])
     assert f_sub.eval(3,1) == 2
-    assert f_sub.deriv(3,1) == (1,-1)
+    assert np.all(f_sub.deriv(3,1) == [1,-1])
 
 def test_add_expr3():
     f_add3 = make_expression(x+x+x, vars=[x])
