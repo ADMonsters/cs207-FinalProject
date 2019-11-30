@@ -36,6 +36,14 @@ def pow(expr1, expr2):
     return ops.Pow.expr(expr1, expr2)
 
 
+def sqrt(expr):
+    return ops.Sqrt.expr(expr)
+
+
+def neg(expr):
+    return ops.Neg.expr(expr)
+
+
 def exp(expr):
     return ops.Exp.expr(expr)
 

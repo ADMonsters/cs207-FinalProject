@@ -138,10 +138,36 @@ class Pow(BinaryOperation):
 
     @classmethod
     def deriv(cls, num1, deriv1, num2, deriv2):
-        result = np.exp(num2 * np.log(num1 + 0j)) * (deriv2 * np.log(num1 + 0j) + num2 * deriv1 / num1)
-        return np.real(result)
+        if num1 > 0:
+            result = np.exp(num2 * np.log(num1)) * (deriv2 * np.log(num1) + num2 * deriv1 / num1)
+            return result
+
+        # deal with the case when log(num1) is complex
+        else:
+            result = np.exp(num2 * np.log(num1 + 0j)) * (deriv2 * np.log(num1 + 0j) + num2 * deriv1 / num1)
+            return np.real(result)
 
 
+class Sqrt(UnaryOperation):
+    @classmethod
+    def eval(cls, num1):
+        return np.sqrt(num1)
+
+    @classmethod
+    def deriv(cls, num1, deriv1):
+        return 1 / 2 / np.sqrt(deriv1)
+    
+
+class Neg(UnaryOperation):
+    @classmethod
+    def eval(cls, num1):
+        return -num1
+
+    @classmethod
+    def deriv(cls, num1, deriv1):
+        return -deriv1
+
+    
 class Exp(UnaryOperation):
     @classmethod
     def eval(cls, num):
