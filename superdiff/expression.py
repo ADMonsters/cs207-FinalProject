@@ -100,6 +100,12 @@ class Var:
     def __rpow__(self, base):
         return sd.pow(base, self)
 
+    def __neg__(self):
+        return sd.neg(self)
+
+    def __eq__(self, other):
+        return self.name == other.name
+        
     def dot(self, other):
         return sd.dot(self, other)
 
@@ -291,3 +297,6 @@ class Expression(Var):
     def __str__(self):
         # TODO: Make this more informative
         return f'{str(self.operation)}: ({str(self.parent1)}, {str(self.parent2)})'
+
+    def __eq__(self, other):
+        return self.__str__() == other.__str__()
