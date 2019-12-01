@@ -1,18 +1,22 @@
 from typing import Union
 import numpy as np
-from superdiff.expression import Expression, Var
+from superdiff.expression import Expression, Var, VectorExpression
 from superdiff import operations as ops
 
 
-def make_expression(expr: Union[Var, Expression], vars=None) -> Expression:
+def make_expression(*exprs: Union[Var, Expression], varlist=None) -> Union[Expression, VectorExpression]:
     """Returns an expression with the varlist in the specified order
 
-    :param expr: Expression -- the expression
+    :param expr: Expression | VectorExpression -- the expression (or iterable of expressions
     :param vars: list[Var] -- A list of Var objects, default None
     """
-    if vars is not None:
-        expr.set_vars(vars)
-    return expr
+    for expr in exprs:
+        if varlist is not None:
+            expr.set_vars(varlist)
+    if len(exprs) > 1:
+        return VectorExpression(exprs, varlist=vars)
+    else:
+        return exprs[0]
 
 
 # Operations
