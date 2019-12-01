@@ -105,6 +105,9 @@ class Var:
 
     def __eq__(self, other):
         return self.name == other.name
+
+    def __hash__(self):
+        return hash(id(self))
         
     def dot(self, other):
         return sd.dot(self, other)
