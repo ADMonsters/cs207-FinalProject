@@ -31,31 +31,42 @@ class Var:
         self.name = name
         self.length = length
 
-    def eval(self, x):
+    def eval(self, x: Union[Number, np.ndarray]):
         """
         Evaluate the variable at x (identity function)
 
-        :param x: Number -- The point to evaluate the Var at
+        :param x: Number|np.ndarray -- The point to evaluate the Var at
         :return: Number -- The number x itself
         """
+        self._check_length(x)
         return x
 
-    def deriv(self, x: Union[bool, Number], var=None) -> Number:
+    def deriv(self, x: Union[bool, Number, np.ndarray], var=None) -> Union[Number, np.ndarray]:
         """Evaluate the derivative of this variable.
 
         `x` is a boolean indicator variable
             True (or non-zero) if this variable is being differentiated
             False (or zero) if this variable is not being differentiated
 
-        :param x: bool | Number -- Whether the derivative is being taken with
+        :param x: bool | Number | np.ndarray -- Whether the derivative is being taken with
             respect to this variable
         :param var: Var -- The variable with respect to which the derivative is being taken
-        :return: int -- 1 or 0
+        :return: int | np.ndarray -- 1 or 0 (or array of ones with dimension `self.length`)
         """
+        self._check_length(x)
         if x is not None:
-            return 1
+            if self.length == 1:
+                return 1
+            else:
+                return np.ones(self.length)
         else:
             return 0
+
+    def _check_length(self, x):
+        if hasattr(x, 'len'):
+            assert len(x) == self.length, f'Incorrect input size (required: {self.length}, given: {len(x)}'
+        else:
+            assert self.length == 1, f'Incorrect input size (required: {self.length}, given: 1'
 
     @property
     def vars(self):
@@ -107,6 +118,7 @@ class Var:
         return self.name == other.name
 
     def __hash__(self):
+        # BEWARE: This might be buggy
         return hash(id(self))
         
     def dot(self, other):
@@ -147,7 +159,8 @@ class Expression(Var):
 
     @vars.setter
     def vars(self, varlist):
-        self._vars = varlist
+        # Call set_vars here
+        self.set_vars(varlist)
 
     def _match_vars_to_parents(self):
         """Matches variables to parent1 and parent2
@@ -180,6 +193,9 @@ class Expression(Var):
 
         Currently just runs forward mode.
 
+        #TODO: Deal with vector outputs
+        #TODO: Reverse mode!
+
         :param args: tuple -- values to evaluate the Expression at
         :param mode: str -- Whether to run in forward or reverse mode
             (possible options: {'forward', 'reverse', 'auto'})
@@ -191,7 +207,7 @@ class Expression(Var):
             res = []
             for var in self.vars:
                 res.append(self._deriv(var, mode, *args))
-            return np.array(res)
+            return res
         else:
             return self._deriv(var, mode, *args)
 
@@ -274,7 +290,7 @@ class Expression(Var):
         :param parent: Var | Number | None -- The parent to evaluate
         :return: Number
         """
-        if isinstance(parent, Number):
+        if not isinstance(parent, Var):
             return parent
         else:
             return parent(*args)
@@ -303,3 +319,48 @@ class Expression(Var):
 
     def __eq__(self, other):
         return self.__str__() == other.__str__()
+
+
+class VectorExpression:
+    """
+    A wrapper expression that can handle vector-valued outputs
+    """
+    def __init__(self, expressions, varlist):
+        self._vars = varlist
+        self._expressions = self._match_vars_to_expressions(varlist, expressions)
+
+    @property
+    def vars(self):
+        return self._vars
+
+    @vars.setter
+    def vars(self, varlist):
+        self._vars = varlist
+        self._expressions = self._match_vars_to_expressions(varlist, self._expressions.keys())  # This might not work
+
+    def eval(self, *args):
+        return [e(self._get_expr_args(e, *args)) for e in self._expressions]
+
+    def deriv(self, *args):
+        return [e.deriv(self._get_expr_args(e, *args)) for e in self._expressions]
+
+    def _get_expr_args(self, expr, *args):
+        expr_vars = self._expressions.get(expr, [])
+        res = []
+        for var in expr_vars:
+            res.append(args[self.vars.index(var)])
+        return res
+
+    @staticmethod
+    def _match_vars_to_expressions(varlist, expressions):
+        return {expr: VectorExpression._get_var_order(varlist, expr) for expr in expressions}
+
+    @staticmethod
+    def _get_var_order(varlist, expr):
+        if not isinstance(expr, Var):
+            return []
+        var_order = [varlist.index(var) for var in expr.vars]
+        return var_order
+
+    def __call__(self, *args, **kwargs):
+        return self.eval(*args)
