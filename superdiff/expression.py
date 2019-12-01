@@ -361,3 +361,6 @@ class VectorExpression:
             return []
         var_order = [varlist.index(var) for var in expr.vars]
         return var_order
+
+    def __call__(self, *args, **kwargs):
+        return self.eval(*args)
