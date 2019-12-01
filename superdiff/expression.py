@@ -105,6 +105,9 @@ class Var:
 
     def __eq__(self, other):
         return self.name == other.name
+
+    def __hash__(self):
+        return hash(id(self))
         
     def dot(self, other):
         return sd.dot(self, other)
@@ -156,7 +159,7 @@ class Expression(Var):
             for parent in self.parents:
                 if var in self._get_parent_vars(parent):
                     parents_of_var.append(parent)
-            matched_vars.update({var: parents_of_var})
+            matched_vars[var] = parents_of_var
         return matched_vars
 
     def eval(self, *args):
