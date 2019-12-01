@@ -156,7 +156,7 @@ class Expression(Var):
             for parent in self.parents:
                 if var in self._get_parent_vars(parent):
                     parents_of_var.append(parent)
-            matched_vars.update({var: parents_of_var})
+            matched_vars[var] = parents_of_var
         return matched_vars
 
     def eval(self, *args):
