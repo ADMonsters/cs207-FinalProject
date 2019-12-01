@@ -210,7 +210,7 @@ class Expression(Var):
             if len(res) == 1:
                 return res[0]
             else:
-                return res
+                return np.array(res)
         else:
             return self._deriv(var, mode, *args)
 
