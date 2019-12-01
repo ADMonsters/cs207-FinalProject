@@ -207,7 +207,10 @@ class Expression(Var):
             res = []
             for var in self.vars:
                 res.append(self._deriv(var, mode, *args))
-            return res
+            if len(res) == 1:
+                return res[0]
+            else:
+                return res
         else:
             return self._deriv(var, mode, *args)
 
