@@ -4,15 +4,15 @@ from superdiff.expression import Expression, Var, VectorExpression
 from superdiff import operations as ops
 
 
-def make_expression(*exprs: Union[Var, Expression], varlist=None) -> Union[Expression, VectorExpression]:
+def make_expression(*exprs: Union[Var, Expression], vars=None) -> Union[Expression, VectorExpression]:
     """Returns an expression with the varlist in the specified order
 
     :param expr: Expression | VectorExpression -- the expression (or iterable of expressions
     :param vars: list[Var] -- A list of Var objects, default None
     """
     for expr in exprs:
-        if varlist is not None:
-            expr.set_vars(varlist)
+        if vars is not None:
+            expr.set_vars(vars)
     if len(exprs) > 1:
         return VectorExpression(exprs, varlist=vars)
     else:
