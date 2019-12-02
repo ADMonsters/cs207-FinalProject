@@ -71,3 +71,7 @@ class ReverseDiff:
             for child, i in children:
                 res += self._bar(child) * self.trace[child]['derivs'][i]
             return res
+
+    def __call__(self, *args, **kwargs):
+        self.forward(self.expr, *args)
+        return self.reverse()
