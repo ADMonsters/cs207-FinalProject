@@ -247,10 +247,7 @@ class Expression(Var):
         :param args: Arguments in order of self.vars
         :return: list[Var]
         """
-        if not isinstance(parent, Var):
-            return []
-        input_args = [args[self.vars.index(parent_var)] for parent_var in parent.vars]
-        return input_args
+        return get_input_args(self.vars, parent, *args)
 
     def _check_input_length(self, *args):
         """Check that the input length matches this function's domain dimensionality.
@@ -367,3 +364,17 @@ class VectorExpression:
 
     def __call__(self, *args, **kwargs):
         return self.eval(*args)
+
+
+def get_input_args(expression, varlist, *args):
+    """Parse the arguments in terms of the ordering for the parent
+
+    :param expression: Expression to be evaluated
+    :param varlist: Ordered list of variables that matches `args`
+    :param args: Arguments in order of self.vars
+    :return: list[Var]
+    """
+    if not isinstance(expression, Var):
+        return []
+    input_args = [args[varlist.index(parent_var)] for parent_var in expression.vars]
+    return input_args
