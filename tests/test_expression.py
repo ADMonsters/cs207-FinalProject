@@ -9,7 +9,7 @@ import superdiff as sd
 from superdiff import make_expression
 from superdiff.expression import *
 import math
-#from superdiff import operations as ops
+
 
 def test_Var_eval():
     x = Var('x')
