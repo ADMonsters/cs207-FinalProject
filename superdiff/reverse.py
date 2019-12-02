@@ -34,8 +34,7 @@ class ReverseDiff:
         if not isinstance(expr, Expression):
             self.trace[expr] = dict(
                 currval=args[0],
-                d1val=1,
-                d2val=0
+                derivs=[1]
             )
             return args[0]
         else:
@@ -54,11 +53,9 @@ class ReverseDiff:
                     self.trace[parent]['children'] = children
             return currval
 
-    def reverse(self, expr, *args):
+    def reverse(self):
         """Compute the reverse pass of forward mode differentiation
 
-        :param expr: Var -- Expression to be differentiated
-        :param args: tuple -- Arguments to differentiate the expression at
         :return: gradient
         """
         return np.array([self._bar(var) for var in self.vars])
