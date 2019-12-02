@@ -22,6 +22,14 @@ class BaseOperation:
             if not isinstance(x, Var) and not isinstance(x, Number):
                 raise TypeError("Not a number/Variable/Expression")
 
+    @classmethod
+    def reverse(cls, *args):
+        """
+        :param args: numbers -- values of the parent nodes
+        :return: numbers -- the reverse mode derivative at the current node
+        """
+        raise NotImplementedError
+
 
 class UnaryOperation(BaseOperation):
     @classmethod
@@ -100,6 +108,10 @@ class Add(BinaryOperation):
     def deriv(cls, num1, deriv1, num2, deriv2):
         return deriv1 + deriv2
 
+    @classmethod
+    def reverse(cls, *args):
+        return (1, 1)
+
 
 class Sub(BinaryOperation):
     @classmethod
@@ -109,6 +121,10 @@ class Sub(BinaryOperation):
     @classmethod
     def deriv(cls, num1, deriv1, num2, deriv2):
         return deriv1 - deriv2
+
+    @classmethod
+    def reverse(cls, *args):
+        return (1, -1)
 
 
 class Mul(BinaryOperation):
@@ -120,6 +136,10 @@ class Mul(BinaryOperation):
     def deriv(cls, num1, deriv1, num2, deriv2):
         return num1 * deriv2 + num2 * deriv1
 
+    @classmethod
+    def reverse(cls, *args):
+        return (args[1], args[0])
+
 
 class Div(BinaryOperation):
     @classmethod
@@ -129,6 +149,10 @@ class Div(BinaryOperation):
     @classmethod
     def deriv(cls, num1, deriv1, num2, deriv2):
         return -(num1 * deriv2 - num2 * deriv1) / (num2 ** 2)
+
+    @classmethod
+    def reverse(cls, *args):
+        return (1 / args[1], - args[0] / args[1]**2)
 
 
 class Pow(BinaryOperation):
@@ -147,6 +171,12 @@ class Pow(BinaryOperation):
             result = np.exp(num2 * np.log(num1 + 0j)) * (deriv2 * np.log(num1 + 0j) + num2 * deriv1 / num1)
             return np.real(result)
 
+    @classmethod
+    def reverse(cls, *args):
+        a = args[0] # parent 1 value -- base
+        b = args[1] # parent 2 value -- exponent
+        return (b * a ** (b-1), np.log(a) * a ** b)
+
 
 class Sqrt(UnaryOperation):
     @classmethod
@@ -155,7 +185,12 @@ class Sqrt(UnaryOperation):
 
     @classmethod
     def deriv(cls, num1, deriv1):
-        return 1 / 2 / np.sqrt(deriv1)
+        return 1 / 2 / np.sqrt(num1) * deriv1
+
+    @classmethod
+    def reverse(cls, *args):
+        a = args[0]
+        return 1 / 2 / np.sqrt(a)
     
 
 class Neg(UnaryOperation):
@@ -167,6 +202,10 @@ class Neg(UnaryOperation):
     def deriv(cls, num1, deriv1):
         return -deriv1
 
+    @classmethod
+    def reverse(cls, *args):
+        return -1
+
     
 class Exp(UnaryOperation):
     @classmethod
@@ -176,6 +215,10 @@ class Exp(UnaryOperation):
     @classmethod
     def deriv(cls, num, deriv):
         return deriv*np.exp(num)
+
+    @classmethod
+    def reverse(cls, *args):
+        return np.exp(args[0])
 
 
 class NLog(UnaryOperation):
@@ -187,6 +230,10 @@ class NLog(UnaryOperation):
     def deriv(cls, val, der):
         return der / val
 
+    @classmethod
+    def reverse(cls, *args):
+        return 1 / args[0]
+
 
 class Log(BinaryOperation):
     @classmethod
@@ -196,6 +243,12 @@ class Log(BinaryOperation):
     @classmethod
     def deriv(cls, val, der, base=np.e, base_der=0):
         return (((der / val) * np.log(base)) - ((base_der / base) * np.log(val))) / (np.log(base)**2)
+
+    @classmethod
+    def reverse(cls, *args):
+        a = args[0]
+        b = args[1]
+        return (- np.log(b) / np.log(a)**2 / a , 1 / np.log(a) / b)
 
 
 class Sin(UnaryOperation):
@@ -207,6 +260,10 @@ class Sin(UnaryOperation):
     def deriv(cls, val, der):
         return np.cos(val) * der
 
+    @classmethod
+    def reverse(cls, *args):
+        return np.cos(args[0])
+
 
 class Cos(UnaryOperation):
     @classmethod
@@ -216,6 +273,10 @@ class Cos(UnaryOperation):
     @classmethod
     def deriv(cls, val, der):
         return -np.sin(val) * der
+
+    @classmethod
+    def reverse(cls, *args):
+        return -np.sin(args[0])
 
 
 class Tan(UnaryOperation):
@@ -227,6 +288,10 @@ class Tan(UnaryOperation):
     def deriv(cls, val, der):
         return der / (np.cos(val) ** 2)
 
+    @classmethod
+    def reverse(cls, *args):
+        return 1 / (np.cos(args[0]) ** 2)
+
 
 class Csc(UnaryOperation):
     @classmethod
@@ -236,6 +301,10 @@ class Csc(UnaryOperation):
     @classmethod
     def deriv(cls, val, der):
         return -der*(1/np.sin(val))*(1/np.tan(val))
+
+    @classmethod
+    def reverse(cls, *args):
+        return -1*(1/np.sin(args[0]))*(1/np.tan(args[0]))
 
 
 class Sec(UnaryOperation):
@@ -247,6 +316,10 @@ class Sec(UnaryOperation):
     def deriv(cls, val, der):
         return der*(1/np.cos(val))*np.tan(val)
 
+    @classmethod
+    def reverse(cls, *args):
+        return 1*(1/np.cos(args[0]))*np.tan(args[0])
+
 
 class Cot(UnaryOperation):
     @classmethod
@@ -257,13 +330,17 @@ class Cot(UnaryOperation):
     def deriv(cls, val, der):
         return -der*(1/np.sin(val))**2
 
+    @classmethod
+    def reverse(cls, *args):
+        return -1*(1/np.sin(args[0]))**2
+
 
 # Vector operations
-class Dot(BinaryOperation):
-    @classmethod
-    def eval(cls, vec1, vec2):
-        return np.dot(vec1, vec2)
-
-    @classmethod
-    def deriv(cls, vec1, deriv1, vec2, deriv2):
-        return np.dot(vec1, deriv2) + np.dot(deriv1, vec2)
+##class Dot(BinaryOperation):
+##    @classmethod
+##    def eval(cls, vec1, vec2):
+##        return np.dot(vec1, vec2)
+##
+##    @classmethod
+##    def deriv(cls, vec1, deriv1, vec2, deriv2):
+##        return np.dot(vec1, deriv2) + np.dot(deriv1, vec2)
