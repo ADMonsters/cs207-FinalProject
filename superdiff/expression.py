@@ -120,7 +120,7 @@ class Var:
     def __hash__(self):
         # BEWARE: This might be buggy
         return hash(id(self))
-        
+
     def dot(self, other):
         return sd.dot(self, other)
 
@@ -320,6 +320,11 @@ class Expression(Var):
 
     def __eq__(self, other):
         return self.__str__() == other.__str__()
+
+    def __hash__(self):
+        # BEWARE: This might be buggy
+        # For some reason this isn't inherited from Var...
+        return hash(id(self))
 
 
 class VectorExpression:

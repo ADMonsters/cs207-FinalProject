@@ -2,6 +2,7 @@ from typing import Union
 import numpy as np
 from superdiff.expression import Expression, Var, VectorExpression
 from superdiff import operations as ops
+from superdiff.reverse import ReverseDiff
 
 
 def make_expression(*exprs: Union[Var, Expression], vars=None) -> Union[Expression, VectorExpression]:
@@ -86,3 +87,8 @@ def cot(expr):
 
 def dot(expr1, expr2):
     return ops.Dot.expr(expr1, expr2)
+
+
+# Convenience function for reverse mode
+def reverse(expr):
+    return ReverseDiff(expr)
