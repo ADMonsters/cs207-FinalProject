@@ -26,7 +26,7 @@ class ReverseDiff:
         :return: Number -- evaluated expression
         """
         if expr is None:
-            return 0
+            return None
         if isinstance(expr, Number):
             return expr
         if expr in self.trace:  # Here we check if we have already visited this node
@@ -38,16 +38,27 @@ class ReverseDiff:
             )
             return args[0]
         else:
-            parvals = self.forward(expr.parent1), self.forward(expr.parent2)
-            currval = expr.operation(*parvals)
-            d1val, d2val = expr.operation.reverse(*parvals)
+            # Parsing args
+            p1_args, p2_args = get_input_args(expr.parent1, expr.vars, *args), \
+                               get_input_args(expr.parent2, expr.vars, *args)
+            parvals = self.forward(expr.parent1, *p1_args), self.forward(expr.parent2, *p2_args)
+
+            # For now, implementing unary/binary as an if-statement. Consider subclassing
+            if parvals[1] is None:
+                currval = expr.operation.eval(parvals[0])
+                d1val = expr.operation.reverse(parvals[0])
+                derivs = [d1val]
+            else:
+                currval = expr.operation.eval(*parvals)
+                d1val, d2val = expr.operation.reverse(*parvals)
+                derivs = [d1val, d2val]
             self.trace[expr] = dict(
                 currval=currval,
-                derivs=[d1val, d2val]
+                derivs=derivs
             )
             # Updating children for the reverse pass
             for i, parent in enumerate(expr.parents):
-                if parent is not None:
+                if isinstance(parent, Var):
                     children = self.trace[parent].get('children', [])
                     children.append((expr, i))  # i tells parent which parent it is (0 or 1)
                     self.trace[parent]['children'] = children
