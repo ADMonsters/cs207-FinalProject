@@ -1,3 +1,5 @@
+from abc import ABC
+
 import numpy as np
 from numbers import Number
 from .expression import Var, Expression
@@ -28,10 +30,10 @@ class BaseOperation:
         :param args: numbers -- values of the parent nodes
         :return: numbers -- the reverse mode derivative at the current node
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
-class UnaryOperation(BaseOperation):
+class UnaryOperation(BaseOperation, ABC):
     @classmethod
     def expr(cls, expr):
         """Create a new expression
@@ -62,7 +64,7 @@ class UnaryOperation(BaseOperation):
         raise NotImplementedError()
 
 
-class BinaryOperation(BaseOperation):
+class BinaryOperation(BaseOperation, ABC):
     @classmethod
     def expr(cls, expr1, expr2):
         """Create a new expression

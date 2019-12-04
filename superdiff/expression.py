@@ -120,7 +120,7 @@ class Var:
     def __hash__(self):
         # BEWARE: This might be buggy
         return hash(id(self))
-        
+
     def dot(self, other):
         return sd.dot(self, other)
 
@@ -203,16 +203,27 @@ class Expression(Var):
             Default: None (gets entire Jacobian)
         :return: tuple(Number) | Number -- Result (length depends on dimensionality of co-domain)
         """
-        if var is None:
-            res = []
-            for var in self.vars:
-                res.append(self._deriv(var, mode, *args))
-            if len(res) == 1:
-                return res[0]
+        assert mode in ('forward', 'reverse', 'auto'), f'Invalid model specified: {mode}. ' \
+                                                       f'Please choose one of "forward", "reverse", "auto".'
+        if mode == 'auto':
+            if len(self.vars) > 1:
+                mode = 'reverse'
             else:
-                return np.array(res)
+                mode = 'forward'
+        if mode == 'forward':
+            if var is None:
+                res = []
+                for var in self.vars:
+                    res.append(self._deriv(var, mode, *args))
+                if len(res) == 1:
+                    return res[0]
+                else:
+                    return np.array(res)
+            else:
+                return self._deriv(var, mode, *args)
         else:
-            return self._deriv(var, mode, *args)
+            rev = sd.reverse(self)
+            return rev(*args)
 
     def _deriv(self, var, mode, *args):
         if self.parent2 is None:
@@ -320,6 +331,11 @@ class Expression(Var):
 
     def __eq__(self, other):
         return self.__str__() == other.__str__()
+
+    def __hash__(self):
+        # BEWARE: This might be buggy
+        # For some reason this isn't inherited from Var...
+        return hash(id(self))
 
 
 class VectorExpression:
