@@ -247,7 +247,7 @@ class Expression(Var):
         :param args: Arguments in order of self.vars
         :return: list[Var]
         """
-        return get_input_args(self.vars, parent, *args)
+        return get_input_args(parent, self.vars, *args)
 
     def _check_input_length(self, *args):
         """Check that the input length matches this function's domain dimensionality.
@@ -293,6 +293,7 @@ class Expression(Var):
         if not isinstance(parent, Var):
             return parent
         else:
+            print(parent)
             return parent(*args)
 
     @staticmethod
