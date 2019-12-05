@@ -85,10 +85,38 @@ def cot(expr):
     return ops.Cot.expr(expr)
 
 
-def dot(expr1, expr2):
-    return ops.Dot.expr(expr1, expr2)
+def arcsin(expr):
+    return ops.ArcSin(expr)
+
+
+def arccos(expr):
+    return ops.ArcCos(expr)
+
+
+def arctan(expr):
+    return ops.ArcTan(expr)
+
+
+def sinh(expr):
+    return (exp(expr) - exp(-expr)) / 2
+
+
+def cosh(expr):
+    return (exp(expr) + exp(-expr)) / 2
+
+
+def tanh(expr):
+    return (exp(expr) - exp(-expr)) / (exp(expr) + exp(-expr))
+
+
+def logistic(expr, k=1, x0=0, L=1):
+    return L / (1 + exp(-k * (expr - x0)))
 
 
 # Convenience function for reverse mode
 def reverse(expr):
     return ReverseDiff(expr)
+
+
+##def dot(expr1, expr2):
+##    return ops.Dot.expr(expr1, expr2)

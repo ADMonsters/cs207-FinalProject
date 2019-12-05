@@ -343,6 +343,48 @@ class Cot(UnaryOperation):
         return -1*(1/np.sin(args[0]))**2
 
 
+class ArcSin(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return np.arcsin(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return der / np.sqrt(1 - val**2)
+
+    @classmethod
+    def reverse(cls, *args):
+        return 1 / np.sqrt(1 - args[0]**2)
+
+
+class ArcCos(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return np.arccos(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return - der / np.sqrt(1 - val**2)
+
+    @classmethod
+    def reverse(cls, *args):
+        return - 1 / np.sqrt(1 - args[0]**2)
+
+
+class ArcTan(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return np.arctan(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return der / (1 + val**2)
+
+    @classmethod
+    def reverse(cls, *args):
+        return 1 / (1 + args[0]**2)
+
+
 # Vector operations
 ##class Dot(BinaryOperation):
 ##    @classmethod
