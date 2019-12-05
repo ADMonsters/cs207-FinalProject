@@ -114,8 +114,9 @@ class Var:
     def __neg__(self):
         return sj.neg(self)
 
-    def __eq__(self, other):
-        return self.name == other.name
+    # It's dangerous to compare just based on the name attribute
+    # def __eq__(self, other):
+    #     return self.name == other.name
 
     def __hash__(self):
         # BEWARE: This might be buggy
@@ -304,7 +305,6 @@ class Expression(Var):
         if not isinstance(parent, Var):
             return parent
         else:
-            print(parent)
             return parent(*args)
 
     @staticmethod
@@ -327,7 +327,13 @@ class Expression(Var):
 
     def __str__(self):
         # TODO: Make this more informative
-        return f'{str(self.operation)}: ({str(self.parent1)}, {str(self.parent2)})'
+        if self.parent2 is None:
+            return self.operation.opstr(self.parent1)
+        else:
+            return self.operation.opstr(self.parent1, self.parent2)
+
+    def __repr__(self):
+        return self.__str__()
 
     def __eq__(self, other):
         return self.__str__() == other.__str__()
