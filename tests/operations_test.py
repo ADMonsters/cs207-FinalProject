@@ -2,9 +2,9 @@ import pytest
 import numpy as np
 import math
 
-from superdiff.operations import *
-from superdiff.expression import *
-from superdiff.superdiff import *
+from superjacob.operations import *
+from superjacob.expression import *
+from superjacob.superjacob import *
 
 # Asserts to ensure correct output with basic inputs
 a, b = 2, 3

@@ -5,7 +5,7 @@ from numbers import Number
 
 import numpy as np
 
-from superdiff.expression import Var, Expression, get_input_args
+from superjacob.expression import Var, Expression, get_input_args
 
 
 class ReverseDiff:

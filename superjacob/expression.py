@@ -13,7 +13,7 @@ from numbers import Number
 
 import numpy as np
 
-import superdiff as sd
+import superjacob as sj
 
 
 class Var:
@@ -82,37 +82,37 @@ class Var:
         return self.eval(*args)
 
     def __add__(self, other):
-        return sd.add(self, other)
+        return sj.add(self, other)
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        return sd.sub(self, other)
+        return sj.sub(self, other)
 
     def __rsub__(self, other):
-        return sd.sub(other, self)
+        return sj.sub(other, self)
 
     def __mul__(self, other):
-        return sd.mul(self, other)
+        return sj.mul(self, other)
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        return sd.div(self, other)
+        return sj.div(self, other)
 
     def __rtruediv__(self, other):
-        return sd.div(other, self)
+        return sj.div(other, self)
 
     def __pow__(self, power):
-        return sd.pow(self, power)
+        return sj.pow(self, power)
 
     def __rpow__(self, base):
-        return sd.pow(base, self)
+        return sj.pow(base, self)
 
     def __neg__(self):
-        return sd.neg(self)
+        return sj.neg(self)
 
     def __eq__(self, other):
         return self.name == other.name
@@ -122,7 +122,7 @@ class Var:
         return hash(id(self))
 
     def dot(self, other):
-        return sd.dot(self, other)
+        return sj.dot(self, other)
 
 
 class Expression(Var):
@@ -222,7 +222,7 @@ class Expression(Var):
             else:
                 return self._deriv(var, mode, *args)
         else:
-            rev = sd.reverse(self)
+            rev = sj.reverse(self)
             return rev(*args)
 
     def _deriv(self, var, mode, *args):
