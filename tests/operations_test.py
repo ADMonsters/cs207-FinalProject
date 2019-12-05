@@ -153,7 +153,7 @@ def test_log_expr():
     assert f_tlog.eval(100) == 2
     assert f_tlog.deriv(100) == 1 / (100*np.log(10))
     assert f_tlog.deriv(100) == 1 / (100*np.log(10))
-    # assert float(f_tlog.deriv(100, mode='reverse')) == 1 / (100*np.log(10))
+    assert float(f_tlog.deriv(100, mode='reverse')) == 1 / (100*np.log(10))
 
 # Multivariate functions
 z = Var("z")
