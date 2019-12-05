@@ -85,62 +85,110 @@ def test_add_expr3():
     f_add3 = make_expression(x+x+x, vars=[x])
     assert f_add3.eval(1) == 3
     assert f_add3.deriv(1) == 3
+    assert f_add3.deriv(1, mode='reverse') == 3
 
 def test_mul_expr():
     f_mul = make_expression(-2*x, vars=[x])
     assert f_mul.eval(2) == -4
     assert f_mul.deriv(2) == -2
+    f_mul.deriv(2, mode='reverse') == -2
 
 def test_mul_const_expr():
     f_mul2 = make_expression(2*x + 1, vars=[x])
     assert f_mul2.eval(5) == 11
     assert f_mul2.deriv(5) == 2
+    assert f_mul2.deriv(5, mode='reverse') == 2
 
 def test_mul_expr_stress():
     f_mul3 = make_expression(2*log(x)+1, vars=[x])
     assert f_mul3.eval(np.e) == 3
     assert f_mul3.deriv(np.e) == 2/np.e
+    assert f_mul3.deriv(np.e, mode='reverse') - 2/np.e < 1e-5
 
 def test_div_expr():
     f_div = make_expression(x/5, vars=[x])
     assert f_div.eval(5) == 1
     assert f_div.deriv(5) == 1/5
+    assert f_div.deriv(5, mode='reverse') == 1/5
 
 def test_div_const_expr():
     f_div2 = make_expression(2/x + 2, vars=[x])
     assert f_div2.eval(2) == 3
     assert f_div2.deriv(2) == -1/2
+    assert f_div2.deriv(2, mode='reverse') == -1/2
 
 def test_div_expr_stress():
     f_div3 = make_expression(2/sin(x) + 3/cos(x), vars=[x])
     assert f_div3.eval(np.pi/6) == (2/np.sin(np.pi/6)) + (3/np.cos(np.pi/6))
     assert f_div3.deriv(np.pi/6) - (-2*(1/np.tan(np.pi/6))*(1/np.sin(np.pi/6))) - (3*(1/np.cos(np.pi/6))*np.tan(np.pi/6)) < 1e-3
+    assert f_div3.deriv(np.pi/6, mode='reverse') - (-2*(1/np.tan(np.pi/6))*(1/np.sin(np.pi/6))) - (3*(1/np.cos(np.pi/6))*np.tan(np.pi/6)) < 1e-3
 
 def test_pow_expr():
     f_pow = make_expression(x**2, vars=[x])
     assert f_pow.eval(5) == 25
     assert f_pow.deriv(5) == 10
+    assert f_pow.deriv(5, mode='reverse') == 10
 
 def test_pow_stress():
     f_pow_stress = make_expression(x**(sin(x)), vars=[x])
     assert f_pow_stress.eval(np.pi / 6) == (np.pi / 6)**(1/2)
     assert f_pow_stress.deriv(np.pi / 6) == ((np.sin(np.pi / 6) / (np.pi / 6)) + np.log(np.pi / 6)*np.cos(np.pi / 6))*(np.pi / 6)**(1/2)
+    assert float(f_pow_stress.deriv(np.pi/6, mode='reverse')) - ((np.sin(np.pi / 6) / (np.pi / 6)) + np.log(np.pi / 6)*np.cos(np.pi / 6))*(np.pi / 6)**(1/2) < 1e-6
     
+    # Edge case when f = x1^x2 and x1 < 0
+    f_pow_edge = make_expression(cos(x)**2, vars=[x])
+    assert f_pow_edge.deriv(np.pi/3) - (-2*np.cos(np.pi/3)*np.sin(np.pi/3)) < 1e-6
+    assert f_pow_edge.deriv(np.pi) - (-2*np.cos(np.pi)*np.sin(np.pi)) < 1e-6
+    assert f_pow_edge.deriv(np.pi, mode='reverse') - (-2*np.cos(np.pi)*np.sin(np.pi)) < 1e-3
+
 def test_log_expr():
     # Natural log -- default
     f_nlog = make_expression(log(x), vars=[x])
     assert f_nlog.eval(np.e) == 1
     assert f_nlog.deriv(np.e) == 1/np.e
+    assert f_nlog.deriv(np.e, mode='reverse') - 1/np.e < 1e-6
 
     # Custom log -- base 10
     f_tlog = make_expression(log(x, 10), vars=[x])
     assert f_tlog.eval(100) == 2
     assert f_tlog.deriv(100) == 1 / (100*np.log(10))
+    assert f_tlog.deriv(100) == 1 / (100*np.log(10))
+    assert float(f_tlog.deriv(100, mode='reverse')) == 1 / (100*np.log(10))
+
+# Multivariate functions
+z = Var("z")
+def test_multi():
+    fm1 = make_expression((x+y+z)**2, vars=[x,y,z])
+    assert fm1.eval(2,3,4) == 81
+    assert fm1.deriv(2,3,4).any() == np.array([18,18,18]).any()
+    assert fm1.deriv(2,3,4, var=z) - 18 < 1e-6 # Partial derivative
+
+    fm2 = make_expression(sin(x) + cos(y), vars=[x,y])
+    assert fm2.eval(np.pi, np.pi) - -1 < 1e-6
+    assert fm2.deriv(np.pi, np.pi).any() == np.array([-1, 1]).any()
+
+# Vector valued functions
+def test_vectors():
+    fv1 = make_expression(x+y, x-y, vars=[x,y])
+    assert fv1.eval(5, 4) == [9, 1]
 
 
-# Diabolical functions
+def test_ops_reverse():
+    assert Add.reverse(x.eval(3), x.deriv(3), y.eval(2), y.deriv(2)) == (1,1)
+    assert Sub.reverse(x.eval(3), x.deriv(3), y.eval(2), y.deriv(2)) == (1,-1)
+    assert Mul.reverse(x.eval(3), y.eval(2)) == (2,3)
 
 
+# Diabolical function
+# def test_diabolical():
+#     # fd1 = (x^(sin(x^2))) / (e^(tan(x)))
+#     fd1 = make_expression((x**sin(x**2))/(exp(x**tan(x))), vars=[x])
+#     assert fd1.eval(np.pi) == (np.pi**np.sin((np.pi)**2))/np.exp(np.pi**np.tan(np.pi))
+#     num1 = np.pi**(np.sin(np.pi**2)-1)
+#     num2 = np.sin(np.pi**2) + (2*(np.pi**2)*np.cos(np.pi**2)*np.log(np.pi)) - (np.pi*(1/np.cos(np.pi)**2))
+#     denom = np.exp(np.tan(np.pi))
+#     assert fd1.deriv(np.pi) == (num1*num2)/denom
+    
 # Types
 string_a = "H"
 string_b = "I"

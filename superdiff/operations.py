@@ -177,7 +177,10 @@ class Pow(BinaryOperation):
     def reverse(cls, *args):
         a = args[0] # parent 1 value -- base
         b = args[1] # parent 2 value -- exponent
-        return (b * a ** (b-1), np.log(a) * a ** b)
+        if a < 0:
+            return np.real((b * a ** (b-1), np.log(a+0j) * a ** b))
+        else:
+            return (b * a ** (b-1), np.log(a) * a ** b)
 
 
 class Sqrt(UnaryOperation):
@@ -250,6 +253,9 @@ class Log(BinaryOperation):
     def reverse(cls, *args):
         a = args[0]
         b = args[1]
+        # if a < 0 or b < 0:
+        #     return np.real((- np.log(b+0j) / np.log(a+0j)**2 / a , 1 / np.log(a+0j) / b))
+        # else:
         return (- np.log(b) / np.log(a)**2 / a , 1 / np.log(a) / b)
 
 

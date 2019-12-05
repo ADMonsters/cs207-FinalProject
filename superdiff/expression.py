@@ -304,7 +304,7 @@ class Expression(Var):
         if not isinstance(parent, Var):
             return parent
         else:
-            print(parent)
+            # print(parent)
             return parent(*args)
 
     @staticmethod
