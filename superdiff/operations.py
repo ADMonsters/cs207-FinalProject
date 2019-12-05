@@ -253,10 +253,7 @@ class Log(BinaryOperation):
     def reverse(cls, *args):
         a = args[0]
         b = args[1]
-        # if a < 0 or b < 0:
-        #     return np.real((- np.log(b+0j) / np.log(a+0j)**2 / a , 1 / np.log(a+0j) / b))
-        # else:
-        return (- np.log(b) / np.log(a)**2 / a , 1 / np.log(a) / b)
+        return (1 / np.log(b) / a, - np.log(a) / np.log(b)**2 / b)
 
 
 class Sin(UnaryOperation):
