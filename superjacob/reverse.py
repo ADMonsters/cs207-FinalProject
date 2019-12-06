@@ -113,7 +113,6 @@ class TraceNode:
             for child in self.children:
                 res += child.bar * child.deriv_parent(self.expr)
             self._bar = res
-        print(self, "BAR: ", self._bar)
         return self._bar
 
     @bar.setter

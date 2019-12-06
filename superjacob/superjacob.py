@@ -11,12 +11,13 @@ def make_expression(*exprs: Union[Var, Expression], vars=None) -> Union[Expressi
     :param expr: Expression | VectorExpression -- the expression (or iterable of expressions
     :param vars: list[Var] -- A list of Var objects, default None
     """
-    for expr in exprs:
-        if vars is not None:
-            expr.set_vars(vars)
+    # for expr in exprs:
+    #     if vars is not None:
+    #         expr.set_vars(vars)
     if len(exprs) > 1:
         return VectorExpression(exprs, varlist=vars)
     else:
+        exprs[0].set_vars(vars)
         return exprs[0]
 
 

@@ -102,7 +102,6 @@ def test_Exp_deriv_forward():
     # sd.dot()
     #f = make_expression(sd.sum(x) - y, vars = [x,y])
     
-test_Exp_deriv_forward()
 def test_Exp_deriv_reverse():
     ''' Checking deriv method in class Expression with vectorized inputs. 
         The test cases check the derivation value with forward mode. '''
