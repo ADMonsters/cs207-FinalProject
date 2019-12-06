@@ -63,9 +63,9 @@ class Var:
             return 0
 
     def _check_length(self, x):
-        if hasattr(x, 'len'):
+        try:
             assert len(x) == self.length, f'Incorrect input size (required: {self.length}, given: {len(x)}'
-        else:
+        except TypeError:  # Assuming that this is a single number
             assert self.length == 1, f'Incorrect input size (required: {self.length}, given: 1'
 
     @property
@@ -365,13 +365,23 @@ class VectorExpression:
         return [e(*self._get_expr_args(e, *args)) for e in self._expressions]
 
     def deriv(self, *args):
-        return [e.deriv(self._get_expr_args(e, *args)) for e in self._expressions]
+        res = np.zeros((len(self._expressions), len(self._vars)))
+        for i, (e, v) in enumerate(self._expressions.items()):
+            expr_args = self._get_expr_args(e, *args)
+            expr_deriv = e.deriv(*expr_args)
+            res[i, :] = self._parse_results(expr_deriv, v)
+        return res
 
     def _get_expr_args(self, expr, *args):
         expr_vars_idx = self._expressions.get(expr, [])
         res = []
         for idx in expr_vars_idx:
             res.append(args[idx])
+        return res
+
+    def _parse_results(self, result_set, expr_vars):
+        res = np.zeros(len(self._vars))
+        res[expr_vars] = result_set
         return res
 
     @staticmethod
@@ -388,6 +398,11 @@ class VectorExpression:
     def __call__(self, *args, **kwargs):
         return self.eval(*args)
 
+    def __repr__(self):
+        return '(' + ', '.join([str(e) for e in self._expressions.keys()]) + ')'
+
+    def __str__(self):
+        return repr(self)
 
 def get_input_args(expression, varlist, *args):
     """Parse the arguments in terms of the ordering for the parent

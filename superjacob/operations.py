@@ -313,7 +313,7 @@ class Log(BinaryOperation):
     @classmethod
     def opstr(cls, expr1, expr2):
         # This might be wrong
-        return f'log_str{expr2}({str(expr1)})'
+        return f'log_{str(expr2)}({str(expr1)})'
 
 
 class Sin(UnaryOperation):
