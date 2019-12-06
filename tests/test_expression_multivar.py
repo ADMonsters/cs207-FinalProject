@@ -87,28 +87,16 @@ def test_Exp_deriv_arguments():
     # f = 2x - y, x is R2, y is R1
     f = make_expression(2 * x - y, vars = [x,y])
     
-    try:
-        f.deriv(4, var = x)
-    except ValueError:
-        pass
-    except:
-        raise Exception('Did not raise error when eval parameter has wrong number of arguments, not multivariate')
-    
-    try:
-        f.deriv(4,[4,5], var = x)
-    except AssertionError:
-        pass
-    except:
-        raise Exception('Did not raise error when eval parameter has wrong type of arguments, not a vector')
-        
-    try:
-        f.deriv([4],[4,5], var = x)
-    except TypeError as msg:
-        print(msg)
-    except:
-        raise Exception('Did not raise error when eval parameter has wrong type of arguments, wrong dimension')
-        
-    
+    with pytest.raises(AssertionError):
+        assert f.deriv(4, var = x)
+
+    with pytest.raises(AssertionError):
+        assert f.deriv(4,[4,5], var = x)
+
+    with pytest.raises(AssertionError):
+        assert f.deriv([4],[4,5], var = x)
+
+
 def test_Exp_deriv_forward():
     ''' Checking deriv method in class Expression with vectorized inputs. 
         The test cases check the derivation value with forward mode. '''
@@ -158,7 +146,6 @@ def test_Exp_deriv_forward():
     # sd.dot()
     #f = make_expression(sd.sum(x) - y, vars = [x,y])
     
-test_Exp_deriv_forward()
 def test_Exp_deriv_reverse():
     ''' Checking deriv method in class Expression with vectorized inputs. 
         The test cases check the derivation value with forward mode. '''
