@@ -362,16 +362,16 @@ class VectorExpression:
         self._expressions = self._match_vars_to_expressions(varlist, self._expressions.keys())  # This might not work
 
     def eval(self, *args):
-        return [e(self._get_expr_args(e, *args)) for e in self._expressions]
+        return [e(*self._get_expr_args(e, *args)) for e in self._expressions]
 
     def deriv(self, *args):
         return [e.deriv(self._get_expr_args(e, *args)) for e in self._expressions]
 
     def _get_expr_args(self, expr, *args):
-        expr_vars = self._expressions.get(expr, [])
+        expr_vars_idx = self._expressions.get(expr, [])
         res = []
-        for var in expr_vars:
-            res.append(args[self.vars.index(var)])
+        for idx in expr_vars_idx:
+            res.append(args[idx])
         return res
 
     @staticmethod
