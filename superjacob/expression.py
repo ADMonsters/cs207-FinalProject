@@ -63,9 +63,9 @@ class Var:
             return 0
 
     def _check_length(self, x):
-        if hasattr(x, 'len'):
+        try:
             assert len(x) == self.length, f'Incorrect input size (required: {self.length}, given: {len(x)}'
-        else:
+        except TypeError:  # Assuming that this is a single number
             assert self.length == 1, f'Incorrect input size (required: {self.length}, given: 1'
 
     @property
