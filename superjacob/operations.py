@@ -63,6 +63,15 @@ class UnaryOperation(BaseOperation, ABC):
         """
         raise NotImplementedError()
 
+    @classmethod
+    def opstr(cls, expr):
+        """For use in the __str__ method of Expression
+
+        :param expr: Expression -- Argument to operation
+        :return: str
+        """
+        raise NotImplementedError()
+
 
 class BinaryOperation(BaseOperation, ABC):
     @classmethod
@@ -98,6 +107,16 @@ class BinaryOperation(BaseOperation, ABC):
         """
         raise NotImplementedError()
 
+    @classmethod
+    def opstr(cls, expr1, expr2):
+        """For use in the __str__ method of Expression
+
+        :param expr1: Expression -- First argument to operation
+        :param expr2: Expression -- Second argument to operation
+        :return: str
+        """
+        raise NotImplementedError()
+
 
 class Add(BinaryOperation):
     @classmethod
@@ -114,6 +133,10 @@ class Add(BinaryOperation):
     def reverse(cls, *args):
         return (1, 1)
 
+    @classmethod
+    def opstr(cls, expr1, expr2):
+        return f'{str(expr1)} + {str(expr2)}'
+
 
 class Sub(BinaryOperation):
     @classmethod
@@ -127,6 +150,10 @@ class Sub(BinaryOperation):
     @classmethod
     def reverse(cls, *args):
         return (1, -1)
+
+    @classmethod
+    def opstr(cls, expr1, expr2):
+        return f'{str(expr1)} - {str(expr2)}'
 
 
 class Mul(BinaryOperation):
@@ -142,6 +169,10 @@ class Mul(BinaryOperation):
     def reverse(cls, *args):
         return (args[1], args[0])
 
+    @classmethod
+    def opstr(cls, expr1, expr2):
+        return f'{str(expr1)} * {str(expr2)}'
+
 
 class Div(BinaryOperation):
     @classmethod
@@ -155,6 +186,10 @@ class Div(BinaryOperation):
     @classmethod
     def reverse(cls, *args):
         return (1 / args[1], - args[0] / args[1]**2)
+
+    @classmethod
+    def opstr(cls, expr1, expr2):
+        return f'{str(expr1)} / {str(expr2)}'
 
 
 class Pow(BinaryOperation):
@@ -182,6 +217,10 @@ class Pow(BinaryOperation):
         else:
             return (b * a ** (b-1), np.log(a) * a ** b)
 
+    @classmethod
+    def opstr(cls, expr1, expr2):
+        return f'{str(expr1)}^{str(expr2)}'
+
 
 class Sqrt(UnaryOperation):
     @classmethod
@@ -196,6 +235,10 @@ class Sqrt(UnaryOperation):
     def reverse(cls, *args):
         a = args[0]
         return 1 / 2 / np.sqrt(a)
+
+    @classmethod
+    def opstr(cls, expr):
+        return f'sqrt({str(expr)})'
     
 
 class Neg(UnaryOperation):
@@ -211,6 +254,10 @@ class Neg(UnaryOperation):
     def reverse(cls, *args):
         return -1
 
+    @classmethod
+    def opstr(cls, expr):
+        return f'-{str(expr)}'
+
     
 class Exp(UnaryOperation):
     @classmethod
@@ -225,6 +272,10 @@ class Exp(UnaryOperation):
     def reverse(cls, *args):
         return np.exp(args[0])
 
+    @classmethod
+    def opstr(cls, expr):
+        return f'exp({str(expr)})'
+
 
 class NLog(UnaryOperation):
     @classmethod
@@ -238,6 +289,10 @@ class NLog(UnaryOperation):
     @classmethod
     def reverse(cls, *args):
         return 1 / args[0]
+
+    @classmethod
+    def opstr(cls, expr):
+        return f'ln({str(expr)})'
 
 
 class Log(BinaryOperation):
@@ -255,6 +310,11 @@ class Log(BinaryOperation):
         b = args[1]
         return (1 / np.log(b) / a, - np.log(a) / np.log(b)**2 / b)
 
+    @classmethod
+    def opstr(cls, expr1, expr2):
+        # This might be wrong
+        return f'log_str{expr2}({str(expr1)})'
+
 
 class Sin(UnaryOperation):
     @classmethod
@@ -268,6 +328,10 @@ class Sin(UnaryOperation):
     @classmethod
     def reverse(cls, *args):
         return np.cos(args[0])
+
+    @classmethod
+    def opstr(cls, expr):
+        return f'sin({str(expr)})'
 
 
 class Cos(UnaryOperation):
@@ -283,6 +347,10 @@ class Cos(UnaryOperation):
     def reverse(cls, *args):
         return -np.sin(args[0])
 
+    @classmethod
+    def opstr(cls, expr):
+        return f'cos({str(expr)})'
+
 
 class Tan(UnaryOperation):
     @classmethod
@@ -296,6 +364,10 @@ class Tan(UnaryOperation):
     @classmethod
     def reverse(cls, *args):
         return 1 / (np.cos(args[0]) ** 2)
+
+    @classmethod
+    def opstr(cls, expr):
+        return f'tan({str(expr)})'
 
 
 class Csc(UnaryOperation):
@@ -311,6 +383,10 @@ class Csc(UnaryOperation):
     def reverse(cls, *args):
         return -1*(1/np.sin(args[0]))*(1/np.tan(args[0]))
 
+    @classmethod
+    def opstr(cls, expr):
+        return f'csc({str(expr)})'
+
 
 class Sec(UnaryOperation):
     @classmethod
@@ -325,6 +401,10 @@ class Sec(UnaryOperation):
     def reverse(cls, *args):
         return 1*(1/np.cos(args[0]))*np.tan(args[0])
 
+    @classmethod
+    def opstr(cls, expr):
+        return f'sec({str(expr)})'
+
 
 class Cot(UnaryOperation):
     @classmethod
@@ -338,6 +418,10 @@ class Cot(UnaryOperation):
     @classmethod
     def reverse(cls, *args):
         return -1*(1/np.sin(args[0]))**2
+
+    @classmethod
+    def opstr(cls, expr):
+        return f'cot({str(expr)})'
 
 
 class ArcSin(UnaryOperation):

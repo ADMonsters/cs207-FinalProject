@@ -5,9 +5,9 @@ Testing methods in class Var and Expression
 """
 import pytest
 import numpy as np
-import superdiff as sd
-from superdiff import make_expression
-from superdiff.expression import *
+import superjacob as sd
+from superjacob import make_expression
+from superjacob.expression import *
 import math
 
 

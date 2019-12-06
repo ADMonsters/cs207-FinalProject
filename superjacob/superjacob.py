@@ -1,8 +1,8 @@
 from typing import Union
 import numpy as np
-from superdiff.expression import Expression, Var, VectorExpression
-from superdiff import operations as ops
-from superdiff.reverse import ReverseDiff
+from superjacob.expression import Expression, Var, VectorExpression
+from superjacob import operations as ops
+from superjacob.reverse import ReverseDiff
 
 
 def make_expression(*exprs: Union[Var, Expression], vars=None) -> Union[Expression, VectorExpression]:

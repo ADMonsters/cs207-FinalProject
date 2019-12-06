@@ -1,14 +1,17 @@
-import superdiff as sd
+import superjacob as sj
 
-x = sd.Var('x')
-y = sd.Var('y')
-z = sd.Var('z')
+x = sj.Var('x')
+y = sj.Var('y')
+z = sj.Var('z')
 
-f = sd.make_expression(x ** 2 + y / x - sd.sin(z) / x, vars=[x, y, z])
+f = sj.make_expression(x ** 2 + y / x - sj.sin(z) / x, vars=[x, y, z])
 # print(f(3, 3, 1))
 print("FORWARD")
 print(f.deriv(3, 3, 1))
-rev = sd.reverse(f)
 print("REVERSE")
+<<<<<<< HEAD
+print(f.deriv(3, 3, 1, mode='reverse'))
+=======
 print(rev(3, 3, 1))
 print(f.deriv(3,3,1, mode='reverse'))
+>>>>>>> master

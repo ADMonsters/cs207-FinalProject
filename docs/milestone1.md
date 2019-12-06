@@ -258,7 +258,7 @@ where `x` and `y` are `Variable` or `Expression` objects. The second argument, `
 - When it comes time to differentiate an expression, the differentiator will find which operation is associated with that given step in the evaluation trace, and simply call `operation_name.deriv(*args)`
 - As well, when the user defines ƒ, they will have to use either the built-in Python operations (add, subtract, multiply, divide, power) or our custom functions, which will have the exact same interface as analogous `numpy` or `math` functions. E.g.
 ```python
-import superdiff as sd
+import superjacob as sd
 
 x = sd.Variable('x')
 y = sd.Variable('y')

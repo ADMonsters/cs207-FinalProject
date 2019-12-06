@@ -1,9 +1,9 @@
 import pytest
 import numpy as np
 
-from superdiff.operations import *
-from superdiff.expression import *
-from superdiff.superdiff import *
+from superjacob.operations import *
+from superjacob.expression import *
+from superjacob.superjacob import *
 
 a, b = 2, 3
 x, y = Var("x"), Var("y")

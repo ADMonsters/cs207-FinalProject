@@ -13,7 +13,7 @@ from numbers import Number
 
 import numpy as np
 
-import superdiff as sd
+import superjacob as sj
 
 
 class Var:
@@ -82,47 +82,48 @@ class Var:
         return self.eval(*args)
 
     def __add__(self, other):
-        return sd.add(self, other)
+        return sj.add(self, other)
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        return sd.sub(self, other)
+        return sj.sub(self, other)
 
     def __rsub__(self, other):
-        return sd.sub(other, self)
+        return sj.sub(other, self)
 
     def __mul__(self, other):
-        return sd.mul(self, other)
+        return sj.mul(self, other)
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        return sd.div(self, other)
+        return sj.div(self, other)
 
     def __rtruediv__(self, other):
-        return sd.div(other, self)
+        return sj.div(other, self)
 
     def __pow__(self, power):
-        return sd.pow(self, power)
+        return sj.pow(self, power)
 
     def __rpow__(self, base):
-        return sd.pow(base, self)
+        return sj.pow(base, self)
 
     def __neg__(self):
-        return sd.neg(self)
+        return sj.neg(self)
 
-    def __eq__(self, other):
-        return self.name == other.name
+    # It's dangerous to compare just based on the name attribute
+    # def __eq__(self, other):
+    #     return self.name == other.name
 
     def __hash__(self):
         # BEWARE: This might be buggy
         return hash(id(self))
 
     def dot(self, other):
-        return sd.dot(self, other)
+        return sj.dot(self, other)
 
 
 class Expression(Var):
@@ -222,7 +223,7 @@ class Expression(Var):
             else:
                 return self._deriv(var, mode, *args)
         else:
-            rev = sd.reverse(self)
+            rev = sj.reverse(self)
             return rev(*args)
 
     def _deriv(self, var, mode, *args):
@@ -304,7 +305,6 @@ class Expression(Var):
         if not isinstance(parent, Var):
             return parent
         else:
-            # print(parent)
             return parent(*args)
 
     @staticmethod
@@ -327,7 +327,13 @@ class Expression(Var):
 
     def __str__(self):
         # TODO: Make this more informative
-        return f'{str(self.operation)}: ({str(self.parent1)}, {str(self.parent2)})'
+        if self.parent2 is None:
+            return self.operation.opstr(self.parent1)
+        else:
+            return self.operation.opstr(self.parent1, self.parent2)
+
+    def __repr__(self):
+        return self.__str__()
 
     def __eq__(self, other):
         return self.__str__() == other.__str__()
@@ -356,16 +362,16 @@ class VectorExpression:
         self._expressions = self._match_vars_to_expressions(varlist, self._expressions.keys())  # This might not work
 
     def eval(self, *args):
-        return [e(self._get_expr_args(e, *args)) for e in self._expressions]
+        return [e(*self._get_expr_args(e, *args)) for e in self._expressions]
 
     def deriv(self, *args):
         return [e.deriv(self._get_expr_args(e, *args)) for e in self._expressions]
 
     def _get_expr_args(self, expr, *args):
-        expr_vars = self._expressions.get(expr, [])
+        expr_vars_idx = self._expressions.get(expr, [])
         res = []
-        for var in expr_vars:
-            res.append(args[self.vars.index(var)])
+        for idx in expr_vars_idx:
+            res.append(args[idx])
         return res
 
     @staticmethod

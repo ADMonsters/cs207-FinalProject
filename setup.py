@@ -6,7 +6,7 @@ with open('README.md', 'r') as fh:
 
 
 setuptools.setup(
-    name='superdiff',
+    name='superjacob',
     version='0.0.1',
     author='Benjamin Levy, Mark Miao, Zhenru Wang, Kidus Negesse',
     description='Yet another autodiff package (YAAP',
