@@ -212,7 +212,10 @@ class Pow(BinaryOperation):
     def reverse(cls, *args):
         a = args[0] # parent 1 value -- base
         b = args[1] # parent 2 value -- exponent
-        return (b * a ** (b-1), np.log(a) * a ** b)
+        if a < 0:
+            return np.real((b * a ** (b-1), np.log(a+0j) * a ** b))
+        else:
+            return (b * a ** (b-1), np.log(a) * a ** b)
 
     @classmethod
     def opstr(cls, expr1, expr2):
@@ -305,7 +308,7 @@ class Log(BinaryOperation):
     def reverse(cls, *args):
         a = args[0]
         b = args[1]
-        return (- np.log(b) / np.log(a)**2 / a , 1 / np.log(a) / b)
+        return (1 / np.log(b) / a, - np.log(a) / np.log(b)**2 / b)
 
     @classmethod
     def opstr(cls, expr1, expr2):
@@ -419,6 +422,48 @@ class Cot(UnaryOperation):
     @classmethod
     def opstr(cls, expr):
         return f'cot({str(expr)})'
+
+
+class ArcSin(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return np.arcsin(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return der / np.sqrt(1 - val**2)
+
+    @classmethod
+    def reverse(cls, *args):
+        return 1 / np.sqrt(1 - args[0]**2)
+
+
+class ArcCos(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return np.arccos(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return - der / np.sqrt(1 - val**2)
+
+    @classmethod
+    def reverse(cls, *args):
+        return - 1 / np.sqrt(1 - args[0]**2)
+
+
+class ArcTan(UnaryOperation):
+    @classmethod
+    def eval(cls, num):
+        return np.arctan(num)
+
+    @classmethod
+    def deriv(cls, val, der):
+        return der / (1 + val**2)
+
+    @classmethod
+    def reverse(cls, *args):
+        return 1 / (1 + args[0]**2)
 
 
 # Vector operations

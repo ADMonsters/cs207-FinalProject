@@ -9,4 +9,9 @@ f = sj.make_expression(x ** 2 + y / x - sj.sin(z) / x, vars=[x, y, z])
 print("FORWARD")
 print(f.deriv(3, 3, 1))
 print("REVERSE")
+<<<<<<< HEAD
 print(f.deriv(3, 3, 1, mode='reverse'))
+=======
+print(rev(3, 3, 1))
+print(f.deriv(3,3,1, mode='reverse'))
+>>>>>>> master

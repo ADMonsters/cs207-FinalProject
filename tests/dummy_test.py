@@ -18,7 +18,18 @@ x, y = Var("x"), Var("y")
 # print(f2.deriv(1))
 # print(f._parse_args(1,3))
 
-# g = make_expression((x+y)**2, [x,y])
+# g = make_expression(log(x), vars=[x])
 
-x/2
-2/x
+# x/2
+# 2/x
+
+# fpow = make_expression(cos(x)**2, vars=[x])
+# print(fpow.deriv(np.pi/3))
+# print((-2*np.cos(np.pi/3)*np.sin(np.pi/3)))
+# print(fpow.deriv(np.pi))
+# print((-2*np.cos(np.pi)*np.sin(np.pi)))
+
+fv1 = make_expression(x+y, x-y, vars=[x,y])
+print(fv1)
+print(((np.sin(np.pi / 6) / (np.pi / 6)) + np.log(np.pi / 6)*np.cos(np.pi / 6))*(np.pi / 6)**(1/2))
+print(1 / (100*np.log(10)))
