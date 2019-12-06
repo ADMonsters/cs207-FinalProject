@@ -29,130 +29,74 @@ def test_Exp_eval():
     x = Var('x')
     y = Var('y')
     
-    # f = [-1,3] + x
-#    f = make_expression([1,3] + x, vars = [x])
-#    assert f.eval([2,4]) ==  [3,7], 'Expression evaluation error.'
-#    
-#    try:
-#        f.eval(4)
-#    except TypeError :
-#        pass
-#    except:
-#        raise Exception('Did not raise error when variable has wrong dimension.')
-#    
-    
     # f = x - y
-    f = make_expression(x - y, vars = [x,y])
+    f = make_expression(x-y, x+y, vars = [x,y])
+    assert (f.eval(2, 4) ==  np.array([-2,6]) ).all(), 'Expression evaluation error.'
     
-    # x is R2, y is R1
-    xval = np.array([2,4])
-    yval = 1
-    assert (f.eval(xval, yval) ==  np.array([1,3]) ).all(), 'Expression evaluation error.'
-    # x is R2, y is R2
-    xval = np.array([2,4])
-    yval = np.array([2,4])
-    assert (f.eval(xval, yval) ==  np.array([0,0]) ).all(), 'Expression evaluation error.'
-    #x is R2, y is R4, should raise error
-    xval = np.array([2,4])
-    yval = np.array([2,4,0,0])
-    try:
-        f.eval(xval, yval)
-    except ValueError:
-        pass
-    except:
-        raise 
-    
-    # Should raise error when wrong number of arguments were provided
-    try:
-        f.eval(4)
-    except AssertionError:
-        pass
-    except:
-        raise Exception('Did not raise error when eval parameter has wrong number of arguments, not multivariate')
+#    # x is R2, y is R1
+#    xval = np.array([2,4])
+#    yval = 1
+#    assert (f.eval(xval, yval) ==  np.array([1,3]) ).all(), 'Expression evaluation error.'
+#    # x is R2, y is R2
+#    xval = np.array([2,4])
+#    yval = np.array([2,4])
+#    assert (f.eval(xval, yval) ==  np.array([0,0]) ).all(), 'Expression evaluation error.'
+#    #x is R2, y is R4, should raise error
+#    xval = np.array([2,4])
+#    yval = np.array([2,4,0,0])
+#    with pytest.raises(ValueError):
+#        f.eval(xval, yval)
+#    
+#    # Should raise error when wrong number of arguments were provided
+#    with pytest.raises(AssertionError):
+#        f.eval(4)
+#    
+#    # Should raise error when parameter is a length-one array
+#    with pytest.raises(AssertionError):
+#        f.eval([4],[4,5])
+#    
+test_Exp_eval()
 
-    # Should raise error when parameter is a length-one array
-    try:
-        f.eval([4],[4,5])
-    except TypeError as msg:
-        print(msg)
-    except:
-        raise Exception('Did not raise error when eval parameter has wrong type of arguments, wrong dimension')
+#def test_Exp_deriv_arguments():
+#    ''' Checking deriv method in class Expression with vectorized inputs. 
+#        The test cases check the arguments passed in for deriv method. '''
+#    x = Var('x')
+#    y = Var('y')
+#    # f = 2x - y, x is R2, y is R1
+#    f = make_expression(2 * x - y, vars = [x,y])
+#    
+#    with pytest.raises(AssertionError):
+#        f.deriv(4, var = x)
+#        
+#    with pytest.raises(AssertionError):
+#        f.deriv(4,[4,5], var = x)
+#        
+#    with pytest.raises(AssertionError):
+#        f.deriv([4],[4,5], var = x)
+#        
+#test_Exp_deriv_arguments()  
 
-#test_Exp_eval()
-def test_Exp_deriv_arguments():
-    ''' Checking deriv method in class Expression with vectorized inputs. 
-        The test cases check the arguments passed in for deriv method. '''
-    x = Var('x')
-    y = Var('y')
-    # f = 2x - y, x is R2, y is R1
-    f = make_expression(2 * x - y, vars = [x,y])
-    
-    try:
-        f.deriv(4, var = x)
-    except ValueError:
-        pass
-    except:
-        raise Exception('Did not raise error when eval parameter has wrong number of arguments, not multivariate')
-    
-    try:
-        f.deriv(4,[4,5], var = x)
-    except AssertionError:
-        pass
-    except:
-        raise Exception('Did not raise error when eval parameter has wrong type of arguments, not a vector')
-        
-    try:
-        f.deriv([4],[4,5], var = x)
-    except TypeError as msg:
-        print(msg)
-    except:
-        raise Exception('Did not raise error when eval parameter has wrong type of arguments, wrong dimension')
-        
-    
 def test_Exp_deriv_forward():
     ''' Checking deriv method in class Expression with vectorized inputs. 
         The test cases check the derivation value with forward mode. '''
+
     x = Var('x')
     y = Var('y')
     
-    # f = [-1,3] + x
-#    f = make_expression([-1,3] + x, vars = [x])
-#    assert f.deriv(2) ==  1, 'Expression derivative error.'
-#    assert f.deriv(0) ==  1, 'Expression derivative error.'
-#    
     # f = 2x - y, x is R2, y is R1
     f = make_expression(2 * x - y, vars = [x,y])
-    xval = np.array([2,4])
-    yval = 1
+    #print(f.deriv(val, mode='reverse', var = x))
+    assert f.deriv(2,4, mode='forward', var = x) ==  2 , 'Expression derivation error.'
+    assert f.deriv(2,4, mode='forward', var = y) ==  -1, 'Expression derivation error.'
+    assert (f.deriv(2,4, mode='forward') ==  np.array([2,-1]) ).all(), 'Expression derivation error.'
     
-    assert (f.deriv(xval, yval, var = x) ==  [2,2]).all() , 'Expression derivation error.'
-    assert f.deriv(xval, yval, var = y) ==  -1, 'Expression derivation error.'
-    #print(f.deriv(xval, yval))
-    print(f.deriv(xval, yval))
-    assert (f.deriv(xval, yval) ==  np.array([2,2,-1]) ).all(), 'Expression derivation error.'
     
-    # f = 2x - y, x is R2, y is R2
-    f = make_expression(2 * x - y, vars = [x,y])
-    xval = np.array([2,4])
-    yval = np.array([-2,-4])
-    assert (f.deriv(xval, yval, var = x) ==  np.array([2,2])).all() , 'Expression derivation error.'
-    assert (f.deriv(xval, yval, var = y) ==  np.array([-1,-1])).all(), 'Expression derivation error.'
-    assert (f.deriv(xval, yval) ==  np.array([2,2,-1,-1]) ).all(), 'Expression derivation error.'
+    f = make_expression(x-y, x+y, vars = [x,y])
+    assert (f.deriv(2, 4, mode='forward', var = x) ==  [1,1]).all, 'Expression derivation error.'
+    assert (f.deriv(2, 4, mode='forward', var = y) ==  [-1,1]).all, 'Expression derivation error.'
+    assert (f.deriv(2, 4, mode='forward') ==  [1,1]).all, 'Expression derivation error.'
     
-    # f = 2x - y, x is R2, y is R4
-    f = make_expression(2 * x - y, vars = [x,y])
-    xval = np.array([2,4])
-    yval = np.array([-2,-4,0,1])
-    try:
-        f.deriv(xval, yval, var = x)
-    except TypeError as msg:
-        print(msg)
-        # TODO: replace message
-        if msg != 'message':
-            raise
-    except:
-        raise
-        
+    
     # f = 2x - y, x is R2, y is R1
     # TODO: sd.sum()
     # sd.dot()
@@ -165,38 +109,16 @@ def test_Exp_deriv_reverse():
     x = Var('x')
     y = Var('y')
     
-    # f = [-1,3] + x
-#    f = make_expression([-1,3] + x, vars = [x])
-#    assert f.deriv(2) ==  1, 'Expression derivative error.'
-#    assert f.deriv(0) ==  1, 'Expression derivative error.'
-#    
     # f = 2x - y, x is R2, y is R1
     f = make_expression(2 * x - y, vars = [x,y])
-    xval = np.array([2,4])
-    yval = 1
-    assert (f.deriv(xval, yval, mode='reverse', var = x) ==  np.array([2,2])).all() , 'Expression derivation error.'
-    assert f.deriv(xval, yval, mode='reverse', var = y) ==  -1, 'Expression derivation error.'
-    #print(f.deriv(xval, yval))
-    assert (f.deriv(xval, yval, mode='reverse') ==  np.array([2,2,-1]) ).all(), 'Expression derivation error.'
+    #print(f.deriv(2,4, mode='reverse', var = x))
+    assert f.deriv(2,4, mode='reverse', var = x) ==  2 , 'Expression derivation error.'
+    assert f.deriv(2,4, mode='reverse', var = y) ==  -1, 'Expression derivation error.'
+    assert (f.deriv(2,4, mode='reverse') ==  np.array([2,-1]) ).all(), 'Expression derivation error.'
     
-    # f = 2x - y, x is R2, y is R2
-    f = make_expression(2 * x - y, vars = [x,y])
-    xval = np.array([2,4])
-    yval = np.array([-2,-4])
-    assert (f.deriv(xval, yval, mode='reverse',var = x) ==  np.array([2,2])).all() , 'Expression derivation error.'
-    assert (f.deriv(xval, yval, mode='reverse',var = y) ==  np.array([-1,-1])).all(), 'Expression derivation error.'
-    assert (f.deriv(xval, yval, mode='reverse',) ==  np.array([2,2,-1,-1]) ).all(), 'Expression derivation error.'
+    f = make_expression(x-y, x+y, vars = [x,y])
+    assert (f.deriv(2, 4, mode='reverse', var = x) ==  [1,1]).all, 'Expression derivation error.'
+    assert (f.deriv(2, 4, mode='reverse', var = y) ==  [-1,1]).all, 'Expression derivation error.'
+    assert (f.deriv(2, 4, mode='reverse') ==  [1,1]).all, 'Expression derivation error.'
     
-    # f = 2x - y, x is R2, y is R4
-    f = make_expression(2 * x - y, vars = [x,y])
-    xval = np.array([2,4])
-    yval = np.array([-2,-4,0,1])
-    try:
-        f.deriv(xval, yval, mode='reverse',var = x)
-    except TypeError as msg:
-        print(msg)
-        # TODO: replace message
-        if msg != 'message':
-            raise
-    except:
-        raise
+#test_Exp_deriv_reverse()
