@@ -184,19 +184,24 @@ def test_multi():
 def test_vectors():
     fv1 = make_expression(x+y, x-y, vars=[x,y])
     assert fv1.eval(5, 4) == [9, 1]
-    assert fv1.deriv(5, 4) == [[1,1],[1,-1]]
+    _compare_2d_arrs(fv1.deriv(5, 4), [[1,1],[1,-1]])
 
     fv2 = make_expression(2*x+y, x-2*y, y+z, vars=[x,y,z])
     assert fv2.eval(10,11,12) == [31, -12, 23]
-    assert fv2.deriv(10, 11, 12) == [[2,1,0],[1,-2,0],[0,1,1]]
+    _compare_2d_arrs(fv2.deriv(10, 11, 12), [[2,1,0],[1,-2,0],[0,1,1]])
 
     # f = [e^(sin(x+y)), tan(y) + sin(z), 2*log(w) + (xy)^2]
     fv3 = make_expression(exp(sin(x+y)), tan(y) + sin(z), 2*log(w) + (x*y)**2, vars=[x,y,z,w])
-    assert fv3.eval(np.pi/4, np.pi/4, np.pi/3, 5) == [np.exp(np.sin(np.pi/4 + np.pi/4)), np.tan(np.pi/4) + np.sin(np.pi/3), 2*np.log(5) + (np.pi/4*np.pi/4)**2]
+    assert (fv3.eval(np.pi/4, np.pi/4, np.pi/3, 5) ==
+            [np.exp(np.sin(np.pi/4 + np.pi/4)), np.tan(np.pi/4) + np.sin(np.pi/3), 2*np.log(5) + (np.pi/4*np.pi/4)**2]).all()
     fv3_df1 = [np.exp(np.sin(np.pi/2))*np.cos(np.pi/2), np.exp(np.sin(np.pi/2))*np.cos(np.pi/2), 0, 0]
     fv3_df2 = [0, 1/(np.cos(np.pi/4)**2), np.cos(np.pi/3), 0]
     fv3_df3 = [2*np.pi/4*(np.pi/4)**2, 2*np.pi/4*(np.pi/4)**2, 0, 2/5]
-    assert fv3.deriv(np.pi/4, np.pi/4, np.pi/3, 5) == [fv3_df1, fv3_df2, fv3_df3]
+    _compare_2d_arrs(fv3.deriv(np.pi/4, np.pi/4, np.pi/3, 5), [fv3_df1, fv3_df2, fv3_df3])
+
+def _compare_2d_arrs(A, B):
+    for a, b in zip(A, B):
+        assert (a == b).all()
 
 def test_ops_reverse():
     assert Add.reverse(x.eval(3), x.deriv(3), y.eval(2), y.deriv(2)) == (1,1)

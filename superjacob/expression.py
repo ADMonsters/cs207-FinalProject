@@ -365,7 +365,7 @@ class VectorExpression:
         return [e(*self._get_expr_args(e, *args)) for e in self._expressions]
 
     def deriv(self, *args):
-        return [e.deriv(self._get_expr_args(e, *args)) for e in self._expressions]
+        return [e.deriv(*self._get_expr_args(e, *args)) for e in self._expressions]
 
     def _get_expr_args(self, expr, *args):
         expr_vars_idx = self._expressions.get(expr, [])
@@ -388,6 +388,11 @@ class VectorExpression:
     def __call__(self, *args, **kwargs):
         return self.eval(*args)
 
+    def __repr__(self):
+        return '(' + ', '.join([str(e) for e in self._expressions.keys()]) + ')'
+
+    def __str__(self):
+        return repr(self)
 
 def get_input_args(expression, varlist, *args):
     """Parse the arguments in terms of the ordering for the parent
