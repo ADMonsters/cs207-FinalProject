@@ -62,15 +62,18 @@ class ReverseDiff:
             self.trace.append(node)
             return currval
 
-    def reverse(self):
+    def reverse(self, var=None):
         """Compute the reverse pass of forward mode differentiation
 
+        :param var: Var -- The variable with respect to which the derivative is taken
         :return: gradient
         """
         res = np.zeros(len(self.vars))
         for node in self.trace[::-1]:
             node_bar = node.bar
             if node in self.vars:
+                if var and node == var:
+                    return node_bar
                 res[self.vars.index(node)] = node_bar
         return res
 
@@ -80,7 +83,7 @@ class ReverseDiff:
 
     def __call__(self, *args, **kwargs):
         self.forward(self.expr, *args)
-        return self.reverse()
+        return self.reverse(**kwargs)
 
 
 class TraceNode:
