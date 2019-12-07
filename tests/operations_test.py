@@ -217,10 +217,10 @@ def test_diabolical():
     # fd1 = (x^(sin(x^2))) / (e^(tan(x)))
     fd1 = make_expression((x**sin(x**2))/(exp(x**tan(x))), vars=[x])
     assert fd1.eval(np.pi) == (np.pi**np.sin((np.pi)**2))/np.exp(np.pi**np.tan(np.pi))
-    # num1 = np.pi**(np.sin(np.pi**2)-1)
-    # num2 = np.sin(np.pi**2) + (2*(np.pi**2)*np.cos(np.pi**2)*np.log(np.pi)) - (np.pi*(1/np.cos(np.pi)**2))
-    # denom = np.exp(np.tan(np.pi))
-    # assert fd1.deriv(np.pi) == (num1*num2)/denom
+    num1 = np.pi**(np.sin(np.pi**2)-1)
+    num2 = np.sin(np.pi**2) + (2*(np.pi**2)*np.cos(np.pi**2)*np.log(np.pi)) - (np.pi*(1/np.cos(np.pi)**2))
+    denom = np.exp(np.tan(np.pi))
+    assert fd1.deriv(np.pi) == (num1*num2)/denom
     
 # Types
 string_a = "H"

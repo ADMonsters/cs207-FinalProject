@@ -114,10 +114,6 @@ class Var:
     def __neg__(self):
         return sj.neg(self)
 
-    # It's dangerous to compare just based on the name attribute
-    # def __eq__(self, other):
-    #     return self.name == other.name
-
     def __hash__(self):
         # BEWARE: This might be buggy
         return hash(id(self))
@@ -334,9 +330,6 @@ class Expression(Var):
 
     def __repr__(self):
         return self.__str__()
-
-    def __eq__(self, other):
-        return self.__str__() == other.__str__()
 
     def __hash__(self):
         # BEWARE: This might be buggy
