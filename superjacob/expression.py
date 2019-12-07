@@ -115,7 +115,6 @@ class Var:
         return sj.neg(self)
 
     def __hash__(self):
-        # BEWARE: This might be buggy
         return hash(id(self))
 
     def dot(self, other):
@@ -322,7 +321,6 @@ class Expression(Var):
         return self.eval(*args)
 
     def __str__(self):
-        # TODO: Make this more informative
         if self.parent2 is None:
             return self.operation.opstr(self.parent1)
         else:
@@ -335,8 +333,7 @@ class Expression(Var):
         return self.__str__() == other.__str__()
 
     def __hash__(self):
-        # BEWARE: This might be buggy
-        # For some reason this isn't inherited from Var...
+        # For some reason this isn't inherited from Var
         return hash(id(self))
 
 
@@ -421,3 +418,4 @@ def get_input_args(expression, varlist, *args):
         return []
     input_args = [args[varlist.index(parent_var)] for parent_var in expression.vars]
     return input_args
+

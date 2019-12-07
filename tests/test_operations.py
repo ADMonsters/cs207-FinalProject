@@ -215,13 +215,16 @@ def test_ops_reverse():
 # Diabolical function
 def test_diabolical():
     # fd1 = (x^(sin(x^2))) / (e^(tan(x)))
-    fd1 = make_expression((x**sin(x**2))/(exp(x**tan(x))), vars=[x])
-    assert fd1.eval(np.pi) == (np.pi**np.sin((np.pi)**2))/np.exp(np.pi**np.tan(np.pi))
+    fd1 = make_expression((x**sin(x**2))/(exp(tan(x))), vars=[x])
+    assert fd1.eval(np.pi) - (np.pi**np.sin((np.pi)**2))/np.exp(np.tan(np.pi)) < 1e-6
     num1 = np.pi**(np.sin(np.pi**2)-1)
     num2 = np.sin(np.pi**2) + (2*(np.pi**2)*np.cos(np.pi**2)*np.log(np.pi)) - (np.pi*(1/np.cos(np.pi)**2))
     denom = np.exp(np.tan(np.pi))
-    assert fd1.deriv(np.pi) == (num1*num2)/denom
-    
+    print(fd1.deriv(np.pi))
+    print((num1*num2)/denom)
+    assert fd1.deriv(np.pi) - (num1*num2)/denom < 1e-6
+    assert fd1.deriv(np.pi, mode='reverse') - (num1*num2)/denom < 1e-6
+
 # Types
 string_a = "H"
 string_b = "I"
