@@ -356,12 +356,19 @@ class VectorExpression:
     def eval(self, *args):
         """Evaluate at `args`
 
-        :param args: Point to evaluate at
+        :param args: tuple[Number] -- Point to evaluate at
         :return: 'res' Number -- Result of evaluation
         """
         return [e(*self._get_expr_args(e, *args)) for e in self._expressions]
 
     def deriv(self, *args, mode='forward', var=None):
+        """Differentiate at `args`
+
+        :param args: tuple[Number] -- Point to evaluate at
+        :param mode: str -- One of {'forward', 'reverse', 'auto'}
+        :param var: Var | None -- Variable with respect to which the derivative is taken
+        :return: 'res' {Number} -- The derivative
+        """
         if var:
             res = np.zeros((len(self._expressions), 1))
         else:
@@ -375,6 +382,7 @@ class VectorExpression:
         return res
 
     def _get_expr_args(self, expr, *args):
+        """Get correct ordering of arguments for this Expression `expr`"""
         expr_vars_idx = self._expressions.get(expr, [])
         res = []
         for idx in expr_vars_idx:
@@ -382,16 +390,19 @@ class VectorExpression:
         return res
 
     def _parse_results(self, result_set, expr_vars):
+        """Parse the reuslts into the correct output shape for this VectorExpression"""
         res = np.zeros(len(self._vars))
         res[expr_vars] = result_set
         return res
 
     @staticmethod
     def _match_vars_to_expressions(varlist, expressions):
+        """Return a dictionary mapping Expression objects to their respective Var's"""
         return {expr: VectorExpression._get_var_order(varlist, expr) for expr in expressions}
 
     @staticmethod
     def _get_var_order(varlist, expr):
+        """Get the correct ordering of arguments for this `expr` Expression"""
         if not isinstance(expr, Var):
             return []
         var_order = [varlist.index(var) for var in expr.vars]

@@ -78,6 +78,7 @@ class ReverseDiff:
         return res
 
     def _add_child(self, parent, child):
+        """Add TraceNode `child` as a child of TraceNode `parent`"""
         if child:
             self.trace[self.trace.index(parent)].add_child(child)
 
@@ -92,6 +93,15 @@ class TraceNode:
     """
 
     def __init__(self, expr, currval=None, derivs=[], child=None):
+        """Initialize a TraceNode
+
+        :param expr: Expression | Var -- The Expression or Var pointed to by
+            this TraceNode
+        :param currval: Number | None -- Value of this TraceNode
+        :param derivs: list -- Value of the derivatives of this TraceNode with
+            respect to its parents
+        :param child: TraceNode -- The child of this TraceNode
+        """
         self.expr = expr
         self.currval = currval
         self.derivs = derivs
@@ -102,6 +112,11 @@ class TraceNode:
         self._bar = None
 
     def add_child(self, child):
+        """Add a child to this TraceNode
+
+        :param child: TraceNode -- Child to be added
+        :return: None
+        """
         if child:
             self.children.append(child)
 
