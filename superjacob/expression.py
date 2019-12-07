@@ -114,12 +114,7 @@ class Var:
     def __neg__(self):
         return sj.neg(self)
 
-    # It's dangerous to compare just based on the name attribute
-    # def __eq__(self, other):
-    #     return self.name == other.name
-
     def __hash__(self):
-        # BEWARE: This might be buggy
         return hash(id(self))
 
     def dot(self, other):
@@ -326,7 +321,6 @@ class Expression(Var):
         return self.eval(*args)
 
     def __str__(self):
-        # TODO: Make this more informative
         if self.parent2 is None:
             return self.operation.opstr(self.parent1)
         else:
@@ -339,8 +333,7 @@ class Expression(Var):
         return self.__str__() == other.__str__()
 
     def __hash__(self):
-        # BEWARE: This might be buggy
-        # For some reason this isn't inherited from Var...
+        # For some reason this isn't inherited from Var
         return hash(id(self))
 
 
@@ -404,6 +397,10 @@ class VectorExpression:
     def __str__(self):
         return repr(self)
 
+    def __eq__(self, other):
+        return self.__str__() == other.__str__()
+
+
 def get_input_args(expression, varlist, *args):
     """Parse the arguments in terms of the ordering for the parent
 
@@ -416,3 +413,4 @@ def get_input_args(expression, varlist, *args):
         return []
     input_args = [args[varlist.index(parent_var)] for parent_var in expression.vars]
     return input_args
+
