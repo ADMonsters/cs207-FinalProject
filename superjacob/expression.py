@@ -171,8 +171,6 @@ class Expression(Var):
     def eval(self, *args):
         """Evaluate this Expression at the specified point
 
-        TODO: Deal with unary operations
-
         :param args: tuple of values to evaluate the Expression at
         :return: Result (length depends on dimensionality of co-domain)
         """
@@ -183,11 +181,6 @@ class Expression(Var):
 
     def deriv(self, *args, mode='forward', var=None):
         """Differentiate this Expression at the specified point.
-
-        Currently just runs forward mode.
-
-        #TODO: Deal with vector outputs
-        #TODO: Reverse mode!
 
         :param args: tuple -- values to evaluate the Expression at
         :param mode: str -- Whether to run in forward or reverse mode
@@ -207,36 +200,41 @@ class Expression(Var):
             if var is None:
                 res = []
                 for var in self.vars:
-                    res.append(self._deriv(var, mode, *args))
+                    res.append(self._deriv(var, *args))
                 if len(res) == 1:
                     return res[0]
                 else:
                     return np.array(res)
             else:
-                return self._deriv(var, mode, *args)
+                return self._deriv(var, *args)
         else:
             rev = sj.reverse(self)
             return rev(*args, var=var)
 
-    def _deriv(self, var, mode, *args):
+    def _deriv(self, var, *args):
+        """Get derivative of self with respect to variable `var` (forward mode)"""
         if self.parent2 is None:
-            return self._unary_deriv(*args, mode=mode, var=var)
+            return self._unary_deriv(*args, var=var)
         else:
-            return self._binary_deriv(*args, mode=mode, var=var)
+            return self._binary_deriv(*args, var=var)
 
     def _unary_eval(self, *args):
+        """Evalute this Expression if unary"""
         return self.operation.eval(self._eval_parent(self.parent1, *args))
 
     def _binary_eval(self, *args):
+        """Evaluate this expression if binary"""
         p1_args, p2_args = self._parse_args(*args)
         return self.operation.eval(self._eval_parent(self.parent1, *p1_args), self._eval_parent(self.parent2, *p2_args))
 
-    def _unary_deriv(self, *args, mode='forward', var=None):
+    def _unary_deriv(self, *args, var=None):
+        """Differentiate this expression if unary (forward mode)"""
         res = self.operation.deriv(self._eval_parent(self.parent1, *args),
                                    self._deriv_parent(self.parent1, var, *args))
         return res
 
-    def _binary_deriv(self, *args, mode='forward', var=None):
+    def _binary_deriv(self, *args, var=None):
+        """Differentiate this expression if binary (forward mode)"""
         p1_args, p2_args = self._parse_args(*args)
         res = self.operation.deriv(self._eval_parent(self.parent1, *p1_args),  # Evaluate and store once
                                    self._deriv_parent(self.parent1, var, *p1_args),
@@ -258,7 +256,6 @@ class Expression(Var):
 
         :param args: Input arguments
         :return: None
-
         :raises: AssertionError
         """
         assert len(args) == len(self.vars), \
@@ -339,6 +336,11 @@ class VectorExpression:
     A wrapper expression that can handle vector-valued outputs
     """
     def __init__(self, expressions, varlist):
+        """Initialize a VectorExpression
+
+        :param expressions: list[Expression | Var] -- The output expressions
+        :param varlist: list[Var] -- Ordering of variables
+        """
         self._vars = varlist
         self._expressions = self._match_vars_to_expressions(varlist, expressions)
 
@@ -352,13 +354,23 @@ class VectorExpression:
         self._expressions = self._match_vars_to_expressions(varlist, self._expressions.keys())  # This might not work
 
     def eval(self, *args):
+        """Evaluate at `args`
+
+        :param args: Point to evaluate at
+        :return: 'res' Number -- Result of evaluation
+        """
         return [e(*self._get_expr_args(e, *args)) for e in self._expressions]
 
     def deriv(self, *args, mode='forward', var=None):
-        res = np.zeros((len(self._expressions), len(self._vars)))
+        if var:
+            res = np.zeros((len(self._expressions), 1))
+        else:
+            res = np.zeros((len(self._expressions), len(self._vars)))
         for i, (e, v) in enumerate(self._expressions.items()):
+            if var and v != var:
+                continue
             expr_args = self._get_expr_args(e, *args)
-            expr_deriv = e.deriv(*expr_args, mode=mode)
+            expr_deriv = e.deriv(*expr_args, mode=mode, var=var)
             res[i, :] = self._parse_results(expr_deriv, v)
         return res
 
