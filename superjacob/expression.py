@@ -117,9 +117,6 @@ class Var:
     def __hash__(self):
         return hash(id(self))
 
-    def dot(self, other):
-        return sj.dot(self, other)
-
 
 class Expression(Var):
     def __init__(self, parent1, parent2, operation, varlist=None):
@@ -174,8 +171,6 @@ class Expression(Var):
     def eval(self, *args):
         """Evaluate this Expression at the specified point
 
-        TODO: Deal with unary operations
-
         :param args: tuple of values to evaluate the Expression at
         :return: Result (length depends on dimensionality of co-domain)
         """
@@ -186,11 +181,6 @@ class Expression(Var):
 
     def deriv(self, *args, mode='forward', var=None):
         """Differentiate this Expression at the specified point.
-
-        Currently just runs forward mode.
-
-        #TODO: Deal with vector outputs
-        #TODO: Reverse mode!
 
         :param args: tuple -- values to evaluate the Expression at
         :param mode: str -- Whether to run in forward or reverse mode
@@ -210,36 +200,41 @@ class Expression(Var):
             if var is None:
                 res = []
                 for var in self.vars:
-                    res.append(self._deriv(var, mode, *args))
+                    res.append(self._deriv(var, *args))
                 if len(res) == 1:
                     return res[0]
                 else:
                     return np.array(res)
             else:
-                return self._deriv(var, mode, *args)
+                return self._deriv(var, *args)
         else:
             rev = sj.reverse(self)
             return rev(*args, var=var)
 
-    def _deriv(self, var, mode, *args):
+    def _deriv(self, var, *args):
+        """Get derivative of self with respect to variable `var` (forward mode)"""
         if self.parent2 is None:
-            return self._unary_deriv(*args, mode=mode, var=var)
+            return self._unary_deriv(*args, var=var)
         else:
-            return self._binary_deriv(*args, mode=mode, var=var)
+            return self._binary_deriv(*args, var=var)
 
     def _unary_eval(self, *args):
+        """Evalute this Expression if unary"""
         return self.operation.eval(self._eval_parent(self.parent1, *args))
 
     def _binary_eval(self, *args):
+        """Evaluate this expression if binary"""
         p1_args, p2_args = self._parse_args(*args)
         return self.operation.eval(self._eval_parent(self.parent1, *p1_args), self._eval_parent(self.parent2, *p2_args))
 
-    def _unary_deriv(self, *args, mode='forward', var=None):
+    def _unary_deriv(self, *args, var=None):
+        """Differentiate this expression if unary (forward mode)"""
         res = self.operation.deriv(self._eval_parent(self.parent1, *args),
                                    self._deriv_parent(self.parent1, var, *args))
         return res
 
-    def _binary_deriv(self, *args, mode='forward', var=None):
+    def _binary_deriv(self, *args, var=None):
+        """Differentiate this expression if binary (forward mode)"""
         p1_args, p2_args = self._parse_args(*args)
         res = self.operation.deriv(self._eval_parent(self.parent1, *p1_args),  # Evaluate and store once
                                    self._deriv_parent(self.parent1, var, *p1_args),
@@ -261,7 +256,6 @@ class Expression(Var):
 
         :param args: Input arguments
         :return: None
-
         :raises: AssertionError
         """
         assert len(args) == len(self.vars), \
@@ -342,6 +336,11 @@ class VectorExpression:
     A wrapper expression that can handle vector-valued outputs
     """
     def __init__(self, expressions, varlist):
+        """Initialize a VectorExpression
+
+        :param expressions: list[Expression | Var] -- The output expressions
+        :param varlist: list[Var] -- Ordering of variables
+        """
         self._vars = varlist
         self._expressions = self._match_vars_to_expressions(varlist, expressions)
 
@@ -355,17 +354,35 @@ class VectorExpression:
         self._expressions = self._match_vars_to_expressions(varlist, self._expressions.keys())  # This might not work
 
     def eval(self, *args):
+        """Evaluate at `args`
+
+        :param args: tuple[Number] -- Point to evaluate at
+        :return: 'res' Number -- Result of evaluation
+        """
         return [e(*self._get_expr_args(e, *args)) for e in self._expressions]
 
     def deriv(self, *args, mode='forward', var=None):
-        res = np.zeros((len(self._expressions), len(self._vars)))
+        """Differentiate at `args`
+
+        :param args: tuple[Number] -- Point to evaluate at
+        :param mode: str -- One of {'forward', 'reverse', 'auto'}
+        :param var: Var | None -- Variable with respect to which the derivative is taken
+        :return: 'res' {Number} -- The derivative
+        """
+        if var:
+            res = np.zeros((len(self._expressions), 1))
+        else:
+            res = np.zeros((len(self._expressions), len(self._vars)))
         for i, (e, v) in enumerate(self._expressions.items()):
+            if var and v != var:
+                continue
             expr_args = self._get_expr_args(e, *args)
-            expr_deriv = e.deriv(*expr_args, mode=mode)
+            expr_deriv = e.deriv(*expr_args, mode=mode, var=var)
             res[i, :] = self._parse_results(expr_deriv, v)
         return res
 
     def _get_expr_args(self, expr, *args):
+        """Get correct ordering of arguments for this Expression `expr`"""
         expr_vars_idx = self._expressions.get(expr, [])
         res = []
         for idx in expr_vars_idx:
@@ -373,16 +390,19 @@ class VectorExpression:
         return res
 
     def _parse_results(self, result_set, expr_vars):
+        """Parse the reuslts into the correct output shape for this VectorExpression"""
         res = np.zeros(len(self._vars))
         res[expr_vars] = result_set
         return res
 
     @staticmethod
     def _match_vars_to_expressions(varlist, expressions):
+        """Return a dictionary mapping Expression objects to their respective Var's"""
         return {expr: VectorExpression._get_var_order(varlist, expr) for expr in expressions}
 
     @staticmethod
     def _get_var_order(varlist, expr):
+        """Get the correct ordering of arguments for this `expr` Expression"""
         if not isinstance(expr, Var):
             return []
         var_order = [varlist.index(var) for var in expr.vars]
