@@ -224,7 +224,7 @@ class Expression(Var):
                 return self._deriv(var, mode, *args)
         else:
             rev = sj.reverse(self)
-            return rev(*args)
+            return rev(*args, var=var)
 
     def _deriv(self, var, mode, *args):
         if self.parent2 is None:
@@ -364,11 +364,11 @@ class VectorExpression:
     def eval(self, *args):
         return [e(*self._get_expr_args(e, *args)) for e in self._expressions]
 
-    def deriv(self, *args):
+    def deriv(self, *args, mode='forward', var=None):
         res = np.zeros((len(self._expressions), len(self._vars)))
         for i, (e, v) in enumerate(self._expressions.items()):
             expr_args = self._get_expr_args(e, *args)
-            expr_deriv = e.deriv(*expr_args)
+            expr_deriv = e.deriv(*expr_args, mode=mode)
             res[i, :] = self._parse_results(expr_deriv, v)
         return res
 
