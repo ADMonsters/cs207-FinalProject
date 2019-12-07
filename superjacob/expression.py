@@ -398,7 +398,12 @@ class VectorExpression:
         return repr(self)
 
     def __eq__(self, other):
-        return self.__str__() == other.__str__()
+        if not isinstance(other, VectorExpression):
+            return False
+        for a, b in zip(self._expressions.keys(), other._expressions.keys()):
+            if a != b:
+                return False
+        return True
 
 
 def get_input_args(expression, varlist, *args):

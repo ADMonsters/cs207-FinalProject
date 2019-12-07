@@ -224,7 +224,7 @@ def test_diabolical():
     print((num1*num2)/denom)
     assert fd1.deriv(np.pi) - (num1*num2)/denom < 1e-6
     assert fd1.deriv(np.pi, mode='reverse') - (num1*num2)/denom < 1e-6
-    
+
 # Types
 string_a = "H"
 string_b = "I"
