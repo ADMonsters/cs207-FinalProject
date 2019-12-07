@@ -117,9 +117,6 @@ class Var:
     def __hash__(self):
         return hash(id(self))
 
-    def dot(self, other):
-        return sj.dot(self, other)
-
 
 class Expression(Var):
     def __init__(self, parent1, parent2, operation, varlist=None):
