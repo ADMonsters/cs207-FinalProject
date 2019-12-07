@@ -131,7 +131,7 @@ class Add(BinaryOperation):
 
     @classmethod
     def reverse(cls, *args):
-        return (1, 1)
+        return 1, 1
 
     @classmethod
     def opstr(cls, expr1, expr2):
@@ -149,7 +149,7 @@ class Sub(BinaryOperation):
 
     @classmethod
     def reverse(cls, *args):
-        return (1, -1)
+        return 1, -1
 
     @classmethod
     def opstr(cls, expr1, expr2):
@@ -167,7 +167,7 @@ class Mul(BinaryOperation):
 
     @classmethod
     def reverse(cls, *args):
-        return (args[1], args[0])
+        return args[1], args[0]
 
     @classmethod
     def opstr(cls, expr1, expr2):
@@ -185,7 +185,7 @@ class Div(BinaryOperation):
 
     @classmethod
     def reverse(cls, *args):
-        return (1 / args[1], - args[0] / args[1]**2)
+        return 1 / args[1], - args[0] / args[1]**2
 
     @classmethod
     def opstr(cls, expr1, expr2):
@@ -210,12 +210,12 @@ class Pow(BinaryOperation):
 
     @classmethod
     def reverse(cls, *args):
-        a = args[0] # parent 1 value -- base
-        b = args[1] # parent 2 value -- exponent
+        a = args[0]  # parent 1 value -- base
+        b = args[1]  # parent 2 value -- exponent
         if a < 0:
             return np.real((b * a ** (b-1), np.log(a+0j) * a ** b))
         else:
-            return (b * a ** (b-1), np.log(a) * a ** b)
+            return b * a ** (b-1), np.log(a) * a ** b
 
     @classmethod
     def opstr(cls, expr1, expr2):
@@ -308,7 +308,7 @@ class Log(BinaryOperation):
     def reverse(cls, *args):
         a = args[0]
         b = args[1]
-        return (1 / np.log(b) / a, - np.log(a) / np.log(b)**2 / b)
+        return 1 / np.log(b) / a, - np.log(a) / np.log(b)**2 / b
 
     @classmethod
     def opstr(cls, expr1, expr2):
@@ -464,14 +464,3 @@ class ArcTan(UnaryOperation):
     @classmethod
     def reverse(cls, *args):
         return 1 / (1 + args[0]**2)
-
-
-# Vector operations
-##class Dot(BinaryOperation):
-##    @classmethod
-##    def eval(cls, vec1, vec2):
-##        return np.dot(vec1, vec2)
-##
-##    @classmethod
-##    def deriv(cls, vec1, deriv1, vec2, deriv2):
-##        return np.dot(vec1, deriv2) + np.dot(deriv1, vec2)
