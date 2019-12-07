@@ -331,6 +331,9 @@ class Expression(Var):
     def __repr__(self):
         return self.__str__()
 
+    def __eq__(self, other):
+        return self.__str__() == other.__str__()
+
     def __hash__(self):
         # BEWARE: This might be buggy
         # For some reason this isn't inherited from Var...
@@ -396,6 +399,15 @@ class VectorExpression:
 
     def __str__(self):
         return repr(self)
+
+    def __eq__(self, other):
+        if not isinstance(other, VectorExpression):
+            return False
+        for a, b in zip(self._expressions.keys(), other._expressions.keys()):
+            if a != b:
+                return False
+        return True
+
 
 def get_input_args(expression, varlist, *args):
     """Parse the arguments in terms of the ordering for the parent
