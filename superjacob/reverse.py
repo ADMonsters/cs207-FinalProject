@@ -11,9 +11,18 @@ from superjacob.expression import Expression, get_input_args
 class ReverseDiff:
     """
     Class implementing reverse mode differentiation
+
+    Attributes:
+        expr: Expression -- The Expression being differentiated
+        vars: list[Var] -- The correct ordering of variables
+        trace: list[TraceNode] -- Each element in the computational trace
     """
 
     def __init__(self, expr):
+        """Initialize a ReverseDiff object
+
+        :param expr: Expression -- The Expression to be differentiated.
+        """
         self.expr = expr
         self.vars = expr.vars
         self.trace = []

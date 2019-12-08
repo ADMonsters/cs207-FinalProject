@@ -27,6 +27,12 @@ class Var:
 
     """
     def __init__(self, name, length=1):
+        """Initialize a Var
+
+        :param name: str -- Name of this variable (e.g. 'x', 'y', etc.)
+        :param length: int -- Length if a vector (default 1 for scalar)
+            This would be used for future extensions allowing atomic vector variables.
+        """
         self._vars = None
         self.name = name
         self.length = length
@@ -63,6 +69,7 @@ class Var:
             return 0
 
     def _check_length(self, x):
+        """Check that the length of the input matches the Var length."""
         try:
             assert len(x) == self.length, f'Incorrect input size (required: {self.length}, given: {len(x)}'
         except TypeError:  # Assuming that this is a single number
@@ -143,6 +150,11 @@ class Expression(Var):
         self.matched_vars = self._match_vars_to_parents()
 
     def set_vars(self, varlist):
+        """Set the varlist of this Expression
+
+        :param varlist: list[Var] -- The new ordering for this Expression
+        :return: None
+        """
         self._vars = varlist
         self.matched_vars = self._match_vars_to_parents()
 
@@ -157,6 +169,7 @@ class Expression(Var):
 
     def _match_vars_to_parents(self):
         """Matches variables to parent1 and parent2
+
         :return: list[tuple] -- Mapping of vars -> parent Expression objects
         """
         matched_vars = {}
@@ -334,6 +347,11 @@ class Expression(Var):
 class VectorExpression:
     """
     A wrapper expression that can handle vector-valued outputs
+
+    Private attributes:
+        _vars: list[Var] -- The ordering of Vars for this VectorExpression
+        _expressions list[Var | Expression] -- The expressions for each output
+            dimension
     """
     def __init__(self, expressions, varlist):
         """Initialize a VectorExpression
