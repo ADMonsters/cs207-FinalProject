@@ -87,15 +87,15 @@ def cot(expr):
 
 
 def arcsin(expr):
-    return ops.ArcSin(expr)
+    return ops.ArcSin.expr(expr)
 
 
 def arccos(expr):
-    return ops.ArcCos(expr)
+    return ops.ArcCos.expr(expr)
 
 
 def arctan(expr):
-    return ops.ArcTan(expr)
+    return ops.ArcTan.expr(expr)
 
 
 def sinh(expr):

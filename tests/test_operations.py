@@ -201,6 +201,32 @@ def test_vectors():
     fv3_df3 = [2*np.pi/4*(np.pi/4)**2, 2*np.pi/4*(np.pi/4)**2, 0, 2/5]
     _compare_2d_arrs(fv3.deriv(np.pi/4, np.pi/4, np.pi/3, 5), [fv3_df1, fv3_df2, fv3_df3])
 
+def test_special_trig():
+    ft1 = make_expression(arcsin(x) + arccos(x) + arctan(x), vars=[x])
+    assert ft1.eval(np.sqrt(2)/2) == np.arcsin(np.sqrt(2)/2) + np.arccos(np.sqrt(2)/2) + np.arctan(np.sqrt(2)/2)
+    assert ft1.deriv(np.sqrt(2)/2) == (1/np.sqrt(1-(np.sqrt(2)/2)**2)) + (-1/np.sqrt(1-(np.sqrt(2)/2)**2)) + (1/(1+(np.sqrt(2)/2)**2))
+
+    ft2 = make_expression(sinh(x) + cosh(x) + tanh(x), vars=[x])
+    assert ft2.eval(2) == ((np.exp(2)-np.exp(-2))/2) + ((np.exp(2)+np.exp(-2))/2) +((np.exp(2)-np.exp(-2))/(np.exp(2)+np.exp(-2)))
+    ftsinh = make_expression(sinh(x), vars=[x])
+    assert ftsinh.deriv(2) == ((np.exp(2)+np.exp(-2))/2)
+    fttanh = make_expression(tanh(x), vars=[x])
+    tanhderiv = ((((np.exp(2)+np.exp(-2))/2))**2 - (((np.exp(2)-np.exp(-2))/2))**2)/((((np.exp(2)+np.exp(-2))/2))**2)
+    assert fttanh.deriv(2) == tanhderiv
+    assert ft2.deriv(2) == ((np.exp(2)-np.exp(-2))/2) + ((np.exp(2)+np.exp(-2))/2) + tanhderiv
+    assert float(ft2.deriv(2, mode='reverse')) - (((np.exp(2)-np.exp(-2))/2) + ((np.exp(2)+np.exp(-2))/2) + tanhderiv) < 1e-1
+
+    ft3 = make_expression(csc(x) + sec(x) + cot(x), vars=[x])
+    assert ft3.eval(np.pi/3) == (1/np.sin(np.pi/3)) + (1/np.cos(np.pi/3)) +(1/np.tan(np.pi/3))
+    assert ft3.deriv(np.pi/3) == (-(1/np.sin(np.pi/3))*(1/np.tan(np.pi/3))) + (1/np.cos(np.pi/3))*(np.tan(np.pi/3)) + (-(1/np.sin(np.pi/3))**2)
+    assert ft3.deriv(np.pi/3, mode='reverse') == (-(1/np.sin(np.pi/3))*(1/np.tan(np.pi/3))) + (1/np.cos(np.pi/3))*(np.tan(np.pi/3)) + (-(1/np.sin(np.pi/3))**2)
+
+def test_logistic():
+    fl = make_expression(logistic(x), vars=[x])
+    assert fl.eval(5) == 1/(1+np.exp(-(5)))
+    assert fl.deriv(5) == (-(1+np.exp(-5))**-2)*(-np.exp(-5))
+    assert fl.deriv(5, mode='reverse') == (-(1+np.exp(-5))**-2)*(-np.exp(-5))
+
 def _compare_2d_arrs(A, B):
     for a, b in zip(A, B):
         for aa, bb in zip(a, b):
